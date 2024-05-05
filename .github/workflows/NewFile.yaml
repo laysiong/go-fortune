@@ -23,7 +23,8 @@ jobs:
             with:
                 scan-type: 'fs'
                 scan-ref: '.'
-                severity: 'CRITICAL'
+                format: 'github'
+                severity: 'HIGH'
 
 
           - name: Upload trivy report as a Github artifact
