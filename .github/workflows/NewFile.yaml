@@ -23,15 +23,18 @@ jobs:
             with:
                 scan-type: 'fs'
                 scan-ref: '.'
-                format: 'sarif'
-                output: 'trivy-results.sarif'                
                 severity: 'HIGH'
 
 
-          - name: Upload trivy report as a Github artifact
-            uses: actions/upload-artifact@v4
-            with:
-                sarif_file: 'trivy-results.sarif'
+          - name: Notify on failure
+            if: steps.trivy-scan.outcome == 'failure'
+            run: |
+                  echo "Failed Trivy scan."
+
+          - name: Notify on success
+            if: steps.trivy-scan.outcome == 'success'
+            run: |
+                  echo "Success."
 
 
 
@@ -58,15 +61,3 @@ jobs:
             env:
                 SLACK_WEBHOOK_URL: ${{ secrets.P_SLACK_API }}
                 SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-
-                # -   name: echo the date
-        #     run: echo "hello, GitHub Action $(date)"
-
-
-
-        # -   name: echo the git brach
-        #     # It is a action community provided
-        #     uses: mscoutermarsh/cowsays-action@master
-        #     with:
-        #         text: I am on branch
-        #         color: red
