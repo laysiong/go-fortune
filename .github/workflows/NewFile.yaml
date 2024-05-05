@@ -23,16 +23,16 @@ jobs:
             with:
                 scan-type: 'fs'
                 scan-ref: '.'
-                format: 'github'
+                format: 'sarif'
+                output: 'trivy-results.sarif'                
                 severity: 'HIGH'
 
 
           - name: Upload trivy report as a Github artifact
             uses: actions/upload-artifact@v4
             with:
-              name: trivy-sbom-report
-              path: '${{ github.workspace }}/dependency-results.sbom.json'
-              retention-days: 20 # 90 is the default
+                sarif_file: 'trivy-results.sarif'
+
 
 
           - name: Send GitHub Action trigger data to Slack workflow
