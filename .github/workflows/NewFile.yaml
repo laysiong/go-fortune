@@ -1,4 +1,5 @@
 name: My Slark Text Workflow
+#test
 
 #trigger
 on:
@@ -14,6 +15,29 @@ jobs:
 
         #steps in this job
         steps:
+          - name: checkout source code
+            uses: actions/checkout@v4
+            with:
+                ref: master
+
+          - name: Run Trivy vulnerability scanner in fs mode
+            uses: aquasecurity/trivy-action@master
+            with:
+                scan-type: 'fs'
+                scan-ref: '.'
+                severity: 'HIGH'
+
+          - name: Get Trivy scan results
+            uses: actions/download-artifact@v2
+            with:
+              name: trivy-results
+
+          - name: Notify on failure and generate report
+            if: failure()
+            run: |
+              cat trivy-results/*.json  
+
+
           - name: Send GitHub Action trigger data to Slack workflow
             id: slack
             uses: slackapi/slack-github-action@v1.26.0
@@ -41,10 +65,7 @@ jobs:
                 # -   name: echo the date
         #     run: echo "hello, GitHub Action $(date)"
 
-        # -   name: checkout source code
-        #     uses: actions/checkout@v4
-        #     with:
-        #         ref: master
+
 
         # -   name: echo the git brach
         #     # It is a action community provided
