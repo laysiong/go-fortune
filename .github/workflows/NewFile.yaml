@@ -29,17 +29,13 @@ jobs:
             id: set-slack-message
             run: |
                 SLACK_TITLE="Image bulid and signed"
-                SLACK_MESSAGE="*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{github.server_url}}/${{github.repository}}\n*Image:* Image URL"
-                echo "::set-output name=message::$SLACK_MESSAGE"
+                SLACK_INFO="*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL"
+                SLACK_MESSAGE="${SLACK_TITLE}\n\n${SLACK_INFO}"
 
           - name: Slack Notification
             uses: rtCamp/action-slack-notify@v2
             env:
-                SLACK_CHANNEL: general
-                SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
-                SLACK_MESSAGE: ${{ steps.set-slack-message.outputs.message }}
-                SLACK_TITLE: Post Title
-                SLACK_USERNAME: demotestcicd
+                SLACK_MESSAGE: ${{ steps.set-slack-message.outputs.message | replace('\n', '\n\n') }}
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
 
 
