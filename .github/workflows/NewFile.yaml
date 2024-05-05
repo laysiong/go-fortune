@@ -28,9 +28,9 @@ jobs:
           - name: Set Slack message
             id: set-slack-message
             run: |
-                SLACK_TITLE="Image bulid and signed"
-                SLACK_INFO="*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL"
-                SLACK_MESSAGE="${SLACK_TITLE}\n\n${SLACK_INFO}"
+             SLACK_TITLE="Notification Title :rocket:"
+             SLACK_INFO="*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL"
+             SLACK_MESSAGE="${SLACK_TITLE}\n\n${SLACK_INFO}"
 
           - name: Slack Notification
             uses: rtCamp/action-slack-notify@v2
