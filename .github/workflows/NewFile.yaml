@@ -30,26 +30,25 @@ jobs:
           - name: Slack Notification
             uses: rtCamp/action-slack-notify@v2
             env:
-                SLACK_CHANNEL: general
-                SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
-                SLACK_ICON: https://github.com/rtCamp.png?size=48
-                SLACK_MESSAGE: 'Post Content :rocket:'
-                SLACK_TITLE: Post Title
-                SLACK_USERNAME: demotestcicd
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
             with:
-                 payload: |
-                  {       
-                    "blocks": [
+                payload: |
+                    {
+                      "blocks": [
                         {
                           "type": "section",
-                          "text":
-                            {
-                              "type": "mrkdwn",
-                              "text": "*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{github.server_url}}/${{github.repository}}\n*Image:* Image URL"
-
-                            }
-                         }
-                    ]
-                  }
+                          "text": {
+                            "type": "mrkdwn",
+                            "text": "*Actions URL:* Bulid and Push"
+                          }
+                        },
+                        {
+                          "type": "section",
+                          "text": {
+                            "type": "mrkdwn",
+                            "text": "Name: person name\nMetriculation: person number\nEmail: person email\nGit:${{github.server_url}}/${{github.repository}}\nImage: Image URL"
+                          }
+                        }
+                      ]
+                    }
   
