@@ -37,12 +37,6 @@ jobs:
                 SLACK_TITLE: Post Title
                 SLACK_USERNAME: demotestcicd
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
-
-
-
-          - name: Send GitHub Action trigger data to Slack workflow
-            id: slack
-            uses: slackapi/slack-github-action@v1.26.0
             with:
                  payload: |
                   { 
@@ -51,15 +45,13 @@ jobs:
                     "blocks": [
                         {
                           "type": "section",
-                          "fields": [
+                          "text":
                             {
                               "type": "mrkdwn",
                               "text": "*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{github.server_url}}/${{github.repository}}\n*Image:* Image URL"
 
-                            }]
+                            }
                          }
                     ]
                   }
-            env:
-                SLACK_WEBHOOK_URL: ${{ secrets.P_SLACK_API }}
-                SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+  
