@@ -39,9 +39,7 @@ jobs:
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
             with:
                  payload: |
-                  { 
-                    "text": "Actions URL:${{github.action}}", 
-      
+                  {       
                     "blocks": [
                         {
                           "type": "section",
