@@ -1,0 +1,54 @@
+name: My Slark Text Workflow
+
+#trigger
+on:
+   push:
+     branches:
+        - 'release/v[0-9]+.[0-9]*'
+
+jobs:
+    #name of your job
+    my-first-job:
+        #runner
+        runs-on: ubuntu-latest    
+
+        #steps in this job
+        steps:
+          - name: Send GitHub Action trigger data to Slack workflow
+            id: slack
+            uses: slackapi/slack-github-action@v1.26.0
+            with:
+                 payload: |
+                  { 
+                    "text": "Actions URL:${{github.action}}", 
+      
+                    "blocks": [
+                        {
+                          "type": "section",
+                          "fields": [
+                            {
+                              "type": "mrkdwn",
+                              "text": "*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{github.server_url}}/${{github.repository}}\n*Image:* Image URL"
+
+                            }]
+                         }
+                    ]
+                  }
+            env:
+                SLACK_WEBHOOK_URL: ${{ secrets.P_SLACK_API }}
+                SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+                # -   name: echo the date
+        #     run: echo "hello, GitHub Action $(date)"
+
+        # -   name: checkout source code
+        #     uses: actions/checkout@v4
+        #     with:
+        #         ref: master
+
+        # -   name: echo the git brach
+        #     # It is a action community provided
+        #     uses: mscoutermarsh/cowsays-action@master
+        #     with:
+        #         text: I am on branch
+        #         color: red
