@@ -28,7 +28,7 @@ jobs:
                 output: './trivy-report.json'
                 exit-code: 1
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
-                severity: 'CRITICAL' #CRITICAL
+                severity: 'HIGH' #CRITICAL
 
           - name: Print exit_code
             run: echo "Trivy exit_code:${{ steps.trivy-scan.outputs.exit_code }}"
