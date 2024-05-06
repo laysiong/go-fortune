@@ -26,6 +26,7 @@ jobs:
                 scan-ref: '.'
                 format: 'json' ## i try table, could not work
                 output: './trivy-report.json'
+                exit-code: 1
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
                 severity: 'HIGH' #CRITICAL
 
@@ -110,10 +111,10 @@ jobs:
                   slack_message="Failed trivy scan, see uploaded report"
                 else
                   slack_message="* Name:* person name
-                * Metriculation:* 2
-                * Email:* 3
-                * Git:* ${{ github.server_url }}/${{ github.repository }}
-                * Image:* Image URL"
+              * Metriculation:* 2
+              * Email:* 3
+              * Git:* ${{ github.server_url }}/${{ github.repository }}
+              * Image:* Image URL"
                 fi
 
                 echo 'slack-message<<EOF' >> $GITHUB_OUTPUT
