@@ -70,7 +70,7 @@ jobs:
      
           - name: Upload Trivy report to Slack on failure
             if: failure()
-            uses: rtCamp/action-slack-notify@v3
+            uses: rtCamp/action-slack-notify@v2
             with:
                 slack_webhook: ${{ secrets.P_SLACK_API }}
                 attachments: trivy-report.json
