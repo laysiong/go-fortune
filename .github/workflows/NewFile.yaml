@@ -27,7 +27,7 @@ jobs:
                 format: 'table'
                 output: './trivy-report.json'
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
-                severity: 'CRITICAL' #CRITICAL
+                severity: 'HIGH' #CRITICAL
 
           - name: Upload trivy report as a Github artifact
             uses: actions/upload-artifact@v4
