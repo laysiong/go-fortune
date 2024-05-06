@@ -27,7 +27,7 @@ jobs:
                 format: 'json' ## i try table, could not work
                 output: './trivy-report.json'
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
-                severity: 'CRITICAL' #CRITICAL
+                severity: 'HIGH' #CRITICAL
 
           - name: Print exit_code and check for vulnerabilities
             run: |
@@ -41,7 +41,7 @@ jobs:
 
             
           - name: Convert Trivy report to Slack-compatible format
-            if: ${{ steps.trivy-scan.outputs.results == 'true' }}
+            if: ${{ VULNS == 'true' }}
             uses: aquasecurity/trivy-action@0.12.0
             with:
                 scan-type: 'convert'
@@ -51,14 +51,14 @@ jobs:
                 output: './trivy-report.txt'
 
           - name: Upload trivy report as a Github artifact
-            if: ${{ steps.trivy-scan.outputs.results == 'true' }}
+            if: ${{ VULNS == 'true' }}
             uses: actions/upload-artifact@v4
             with:
               name: trivy-sbom-report
               path: './trivy-report.txt'
 
           - name: Upload Trivy report to Slack
-            if: ${{ steps.trivy-scan.outputs.results == 'true' }}
+            if: ${{ VULNS == 'true' }}
             uses: MeilCli/slack-upload-file@v4
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
