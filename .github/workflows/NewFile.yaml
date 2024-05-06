@@ -52,24 +52,13 @@ jobs:
             if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             uses: sigstore/cosign-installer@v3.5.0
             
-            #docker push <acct name/my-app:<git-commit>
-          # - name: build and push docker image
-          #   if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
-          #   uses: docker/build-push-action@v2
-          #   with:
-          #     username: ${{ secrets.dockerhub_username }}
-          #     password: ${{ secrets.dockerhub_token }}
-          #     repository: ${{ github.repository }}
-          #     tag_with_ref: true
       
           - name: Log into registry
             if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             uses: docker/login-action@v3
             with:
               username: ${{ secrets.dockerhub_username }}
-              password: ${{ secrets.dockerhub_token }}
-              repository: ${{ github.repository }}
-            
+              password: ${{ secrets.dockerhub_token }}            
       
 
           - name: build and push docker image
@@ -114,8 +103,10 @@ jobs:
             id: Slack_Summary
             run: |
               if [[ "${{ steps.set-vulns-output.outputs.vulns }}" == 'true' ]]; then
+                  slack_color="danger"    
                   slack_message="Failed trivy scan, see uploaded report"
                 else
+                  slack_color="good"
                   slack_message="* Name:* Toh Lay Siong
               * Metriculation:* A0291916W
               * Email:* mrlaysiong@gmail.com
@@ -123,6 +114,7 @@ jobs:
               * Image:* <https://hub.docker.com/repository/docker/${{ github.repository }}>"
                 fi
 
+                echo "slack-color=$slack_color" >> $GITHUB_ENV
                 echo 'slack-message<<EOF' >> $GITHUB_OUTPUT
                 echo "$slack_message" >> $GITHUB_OUTPUT
                 echo 'EOF' >> $GITHUB_OUTPUT
@@ -131,6 +123,7 @@ jobs:
             uses: rtCamp/action-slack-notify@v2
             env:
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
+                SLACK_COLOR: ${{ env.slack-color }} # or a specific color like 'good' or '#ff00ff'
                 SLACK_MESSAGE: ${{ steps.Slack_Summary.outputs.slack-message }}
                 SLACK_TITLE: 'Image build and signed'
 
