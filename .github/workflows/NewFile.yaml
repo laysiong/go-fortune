@@ -1,4 +1,4 @@
-name: My Slark Text Workflow
+name: Build and Push
 #test
 
 #trigger
@@ -12,25 +12,55 @@ jobs:
     my-first-job:
         #runner
         runs-on: ubuntu-latest    
+        if: "!startsWith(github.event.head_commit.message, '#NORUN')"
 
         #steps in this job
         steps:
           - name: checkout source code
             uses: actions/checkout@v4
 
+
+            #Trivy fs -s file(.)
           - name: Run Trivy vulnerability scanner in fs mode
             uses: aquasecurity/trivy-action@master
             with:
                 scan-type: 'fs'
                 scan-ref: '.'
                 severity: 'HIGH'
+
+          - name: Check for vulnerabilities
+            id: check_vulnerabilities
+            run: echo ::set-output name=has_vulnerabilities::$(jq -r '.Vulnerabilities | length > 0' ${{ steps.trivy_scan.outputs.scan-results }})
+
+          - name: Notify Slack if vulnerabilities found
+            if: steps.check_vulnerabilities.outputs.has_vulnerabilities == 'true'
+            uses: rtCamp/action-slack-notify@v2
+            with:
+                slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
+                message: "Security vulnerabilities detected in the repository. Scan report has been uploaded."
+
+          - name: Upload scan report as artifact
+            uses: actions/upload-artifact@v2
+            with:
+                name: trivy-scan-report
+                path: ${{ steps.trivy_scan.outputs.scan-results }}
+
+          - name: Fail if vulnerabilities found
+            if: steps.check_vulnerabilities.outputs.has_vulnerabilities == 'true'
+            run: exit 1
+
+
+            #if success, docker build -t <acc name>/my-app:<git commit>
+            # Docker push <acct name> / my-app:<git-commit> push image to docker
+            #consign generate key pairs
+            #consign sign--key consign.key <account>/myapp:<git-commit>
+
          
           - name: Set Slack message
             id: set-slack-message
             run: |
-             SLACK_TITLE="Notification Title :rocket:"
-             SLACK_INFO="*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL"
-             SLACK_MESSAGE="${SLACK_TITLE}\n\n${SLACK_INFO}"
+             SLACK_TITLE="Image build and signed"
+             SLACK_MESSAGE="*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL"
 
           - name: Slack Notification
             uses: rtCamp/action-slack-notify@v2
