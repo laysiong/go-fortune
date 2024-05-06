@@ -73,7 +73,7 @@ jobs:
             uses: MeilCli/slack-upload-file@v4
             with:
                 channel: ${{ secrets.P_SLACK_API }} 
-                token: ${{ secrets.P_SLACK_BOT_TOKEN }}
+                slack_token: ${{ secrets.P_SLACK_BOT_TOKEN }}
                 attachments: trivy-report.txt
 
 
