@@ -29,20 +29,13 @@ jobs:
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
                 severity: 'HIGH' #CRITICAL
 
-          - name: Print exit_code and check for vulnerabilities
-            id: vul-output
-            run: |
-                VULNS=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
-                if echo $VULNS | grep -q 'true'; then
-                  echo "results=1" >> $GITHUB_OUTPUT
-                else
-                  echo "results=0" >> $GITHUB_OUTPUT
-                fi
-                echo "Results: $VULNS"
+          - name: Set VULNS output
+            id: set-vulns-output
+            run: echo "::set-output name=vulns::$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')"
 
              
           - name: Convert Trivy report to Slack-compatible format
-            if: ${{ steps.vul-output.outputs.results == 'true' }}
+            if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
             uses: aquasecurity/trivy-action@0.12.0
             with:
                 scan-type: 'convert'
@@ -52,14 +45,14 @@ jobs:
                 output: './trivy-report.txt'
 
           - name: Upload trivy report as a Github artifact
-            if: ${{ steps.vul-output.outputs.results == 'true' }}
+            if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
             uses: actions/upload-artifact@v4
             with:
               name: trivy-sbom-report
               path: './trivy-report.txt'
 
           - name: Upload Trivy report to Slack
-            if: ${{ steps.vul-output.outputs.results == 'true' }}
+            if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
             uses: MeilCli/slack-upload-file@v4
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
