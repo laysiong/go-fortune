@@ -25,7 +25,7 @@ jobs:
                 scan-type: 'fs'
                 scan-ref: '.'
                 format: 'table'
-                output: 'trivy-report.txt'
+                output: 'trivy-report.json'
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
                 severity: 'CRITICAL' #CRITICAL
 
@@ -33,7 +33,7 @@ jobs:
             uses: actions/upload-artifact@v4
             with:
               name: trivy-sbom-report
-              path: './trivy-report.txt'
+              path: './trivy-report.json'
 
 
             #install Cosign
