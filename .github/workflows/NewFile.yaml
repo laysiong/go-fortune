@@ -24,10 +24,14 @@ jobs:
             with:
                 scan-type: 'fs'
                 scan-ref: '.'
-                format: 'table'
+                format: 'json'
                 output: 'trivy-report.json'
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
                 severity: 'CRITICAL' #CRITICAL
+
+        # Convert Trivy JSON report to table format
+          - name: Convert Trivy JSON report to table format
+            run: trivy convert --format table trivy-report.json
 
           - name: Upload trivy report as a Github artifact
             uses: actions/upload-artifact@v4
@@ -35,6 +39,12 @@ jobs:
               name: trivy-sbom-report
               path: './trivy-report.json'
 
+          - name: Upload Trivy report to Slack
+            uses: MeilCli/slack-upload-file@v4
+            with:
+                slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
+                channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
+                file_path: './trivy-report.json'
 
             #install Cosign
           # - name: Install Cosign
