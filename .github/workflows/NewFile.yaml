@@ -24,10 +24,30 @@ jobs:
             with:
                 scan-type: 'fs'
                 scan-ref: '.'
-                output: 'trivy-report.txt'
+                format: 'sarif'
+                output: 'trivy-report.sarif'
                 severity: 'CRITICAL' #CRITICAL
 
+          - name: Upload trivy report as a Github artifact
+            uses: actions/upload-artifact@v4
+            with:
+                name: trivy-sbom-report
+                sarif_file: 'trivy-report.sarif'
 
+          # - name: Read Trivy report file
+          #   id: read-report
+          #   run: |
+          #      report_content=$(<trivy-report.txt)
+          #      echo "::set-output name=report_content::$report_content"
+
+          # - name: Upload Trivy report to Slack on failure
+          #  #if: failure()
+          #   uses: MeilCli/slack-upload-file@v4
+          #   with:
+          #       channel_id: ${{ secrets.P_SLACK_API }} 
+          #       slack_token: ${{ secrets.P_SLACK_BOT_TOKEN }}
+          #       content: ${{ steps.read-report.outputs.report_content }}
+          #       file_name: trivy-report.txt
 
             #install Cosign
           - name: Install Cosign
@@ -68,13 +88,7 @@ jobs:
           #      COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
      
-          - name: Upload Trivy report to Slack on failure
-           #if: failure()
-            uses: MeilCli/slack-upload-file@v4
-            with:
-                channel_id: ${{ secrets.P_SLACK_API }} 
-                slack_token: ${{ secrets.P_SLACK_BOT_TOKEN }}
-                attachments: trivy-report.txt
+    
 
 
            #Slack notification (Currently, fomart is wrong)
