@@ -71,13 +71,12 @@ jobs:
           - name: Generate Cosign Key Pairs
             id: generate_keys
             run: |
-              cosign generate-key-pair
+             mkdir -p keys
+             cd keys
+             cosign generate-key-pair
 
 
-            ## Error is file path directionary
-          - name: Sign Docker Image
-            run: |
-                cosign sign --key cosign.key ${{ github.repository }}:${{ github.event.head_commit.message }}
+  
       
 
      
