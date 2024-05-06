@@ -51,7 +51,7 @@ jobs:
               push: true
               tags: ${{ github.repository }}:${{ github.event.head_commit.message }}
 
-
+              #
             #consign generate key pairs
             #consign sign--key consign.key <account>/myapp:<git-commit>
           - name: Generate Cosign Key Pairs
