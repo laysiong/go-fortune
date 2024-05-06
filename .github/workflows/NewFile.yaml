@@ -77,9 +77,7 @@ jobs:
           - name: Sign Docker Image
             run: |
                 cosign sign --key cosign.key ${{ github.repository }}:${{ github.event.head_commit.message }}
-            env:
-              COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-
+   
 
 
            #Slack notification (Currently, fomart is wrong)
