@@ -79,7 +79,7 @@ jobs:
             with:
               context: .
               push : true
-              tags: ${{ github.repository }}:$(git rev-parse --short HEAD)
+              tags: ${{ github.repository }}:${{github.run_id}}
               secrets: |
                 GIT_AUTH_TOKEN=${{ secrets.MY_API }}
 
@@ -96,7 +96,7 @@ jobs:
           - name: Sign Docker Image
             if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             run: |
-              cosign sign --key cosign.key ${{ github.repository }}:$(git rev-parse --short HEAD)
+              cosign sign --key cosign.key ${{ github.repository }}:${{github.run_id}}
             env:
               COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
