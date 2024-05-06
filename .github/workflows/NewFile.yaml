@@ -28,6 +28,7 @@ jobs:
                 output: 'trivy-report.sarif'
                 severity: 'CRITICAL' #CRITICAL
 
+        #
           - name: Upload trivy report as a Github artifact
             uses: github/codeql-action/upload-artifact@v2
             with:
