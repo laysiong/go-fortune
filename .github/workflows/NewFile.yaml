@@ -96,11 +96,11 @@ jobs:
               if [[ "${{ steps.set-vulns-output.outputs.vulns }}" == 'true' ]]; then
                   slack_message="Failed trivy scan, see uploaded report"
                 else
-                  slack_message="* Name:* person name
-              * Metriculation:* 2
-              * Email:* 3
+                  slack_message="* Name:* Toh Lay Siong
+              * Metriculation:* A0291916W
+              * Email:* mrlaysiong@gmail.com
               * Git:* ${{ github.server_url }}/${{ github.repository }}
-              * Image:* Image URL"
+              * Image:* <https://hub.docker.com/repository/docker/${{ github.repository }}>"
                 fi
 
                 echo 'slack-message<<EOF' >> $GITHUB_OUTPUT
