@@ -34,14 +34,14 @@ jobs:
                 VULNS=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
                 if echo $VULNS | grep -q 'true'; then
                   echo "Vulnerabilities found, creating issue"
-                  echo "results=$(cat ./trivy-report.json)" >> $GITHUB_OUTPUT
+                  #echo "results=$(cat ./trivy-report.json)" >> $GITHUB_OUTPUT
                 else
                   echo "No vulnerabilities found, halting"
-                  echo "results=nothing" >> $GITHUB_OUTPUT
+                  #echo "results=nothing" >> $GITHUB_OUTPUT
                 fi
 
           - name: Convert Trivy report to Slack-compatible format
-            if: ${{ steps.trivy-scan.outputs.exit_code == '1' }}
+            if: ${{ steps.Check for vulnerabilities.outputs.results != 'nothing' }}
             uses: aquasecurity/trivy-action@0.12.0
             with:
                 scan-type: 'convert'
