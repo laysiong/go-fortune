@@ -26,13 +26,15 @@ jobs:
                 scan-ref: '.'
                 format: 'sarif'
                 output: 'trivy-report.sarif'
+                github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
                 severity: 'CRITICAL' #CRITICAL
 
         #
           - name: Upload trivy report as a Github artifact
-            uses: github/codeql-action/upload-sarif@v2
+            uses: actions/upload-artifact@v4
             with:
-                sarif_file: 'trivy-results.sarif'
+              name: trivy-sbom-report
+              path: '${{ github.workspace }}/trivy-report.sarif'
 
 
           # - name: Read Trivy report file
