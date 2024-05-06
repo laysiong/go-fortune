@@ -104,8 +104,11 @@ jobs:
             uses: rtCamp/action-slack-notify@v2
             env:
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
-                SLACK_MESSAGE: '*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL\n"'
-                SLACK_TITLE: 'Image build and signed"'
+                SLACK_MESSAGE: '*Name:* person name*
+                                *Metriculation:* person number
+                                *Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}
+                                *Image:* Image URL\n"'
+                SLACK_TITLE: 'Image build and signed'
 
 
           # - name: Send GitHub Action trigger data to Slack workflow
