@@ -40,9 +40,10 @@ jobs:
            #if: failure()
             uses: MeilCli/slack-upload-file@v4
             with:
-                channel_id: ${{ secrets.P_SLACK_API }} 
                 slack_token: ${{ secrets.P_SLACK_BOT_TOKEN }}
-                file_path: '${{ github.workspace }}/trivy-report.json'
+                channel_id: ${{ secrets.P_SLACK_CHANNEL_ID }} 
+
+                file_path: 'trivy-report.json'
 
 
             #install Cosign
