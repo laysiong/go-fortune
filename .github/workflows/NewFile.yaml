@@ -25,7 +25,15 @@ jobs:
                 scan-type: 'fs'
                 scan-ref: '.'
                 exit-code: '1'
+                output: 'trivy-results.sarif'
                 severity: 'CRITICAL' 
+
+          ## upload report file to slack
+          - name: Upload Trivy scan results to GitHub Security tab
+            uses: github/codeql-action/upload-sarif@v2
+            with: 
+                sarif_file: 'trivy-results.sarif'
+
 
             #install Cosign
           - name: Install Cosign
@@ -45,8 +53,9 @@ jobs:
               username: ${{ secrets.DOCKERHUB_USERNAME }}
               password: ${{ secrets.DOCKERHUB_TOKEN }}
           - run: |
-                docker build . -t ${{github.repository}}:${{ github.event.head_commit.message }}
-                docker push ${{github.repository}}:${{ github.event.head_commit.message }}
+                echo "${{ github.repository }}:${{ github.event.head_commit.message }}"
+                docker build . -t ${{github.repository }}:${{ github.event.head_commit.message }}
+                docker push ${{ github.repository }}:${{ github.event.head_commit.message }}
 
           
             #consign generate key pairs
@@ -54,18 +63,22 @@ jobs:
           - name: Generate Cosign Key Pairs
             id: generate_keys
             run: |
-              cosign generate-key-pair
+              cosign generate-key-pair github://laysiong/go-fortune
 
 
             ## Error is file path directionary
           - name: Sign Docker Image
             run: |
-              cosign sign --key cosign.key ${{ github.repository }}:${{ github.event.head_commit.message }}
+                cosign sign --key cosign.key ${{ github.repository }}:${{ github.event.head_commit.message }}
             env:
                COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
 
-           #Slack notification
+
+
+
+
+           #Slack notification (Currently, fomart is wrong)
           - name: Set Slack message
             id: set-slack-message
             run: |
