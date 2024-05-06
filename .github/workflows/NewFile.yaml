@@ -54,25 +54,25 @@ jobs:
        
             #consign generate key pairs
             #consign sign--key consign.key <account>/myapp:<git-commit>
-    sign_image:
-        runs-on: ubuntu-latest
-        steps:
-          - name: Generate Cosign Key Pairs
-            id: generate_keys
-            run: |
-              cosign generate-key-pair
+    # sign_image:
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #       - name: Generate Cosign Key Pairs
+    #         id: generate_keys
+    #         run: |
+    #           cosign generate-key-pair
 
-          - name: Load Docker Image Digest
-            id: load_digest
-            run: |
-              echo "::set-env name=IMAGE_DIGEST::$(docker inspect --format='{{index .RepoDigests 0}}' <account>/myapp:<git-commit>)"
+    #       - name: Load Docker Image Digest
+    #         id: load_digest
+    #         run: |
+    #           echo "::set-env name=IMAGE_DIGEST::$(docker inspect --format='{{index .RepoDigests 0}}' <account>/myapp:<git-commit>)"
 
-          - name: Sign Docker Image
-            run: |
-              IMAGE_DIGEST=${{ env.IMAGE_DIGEST }}
-              cosign sign --key cosign.key <account>/myapp:${IMAGE_DIGEST}
-            env:
-              COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+    #       - name: Sign Docker Image
+    #         run: |
+    #           IMAGE_DIGEST=${{ env.IMAGE_DIGEST }}
+    #           cosign sign --key cosign.key <account>/myapp:${IMAGE_DIGEST}
+    #         env:
+    #           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
 
     slack_not:
