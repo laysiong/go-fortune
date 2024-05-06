@@ -29,34 +29,35 @@ jobs:
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
                 severity: 'CRITICAL' #CRITICAL
 
-          - name: Check Trivy exit code
-            id: check-trivy-exit-code
-            run: echo "{name}=trivy_exit_code::${{ steps.trivy-scan.outputs.exit_code }}" >> $GITHUB_OUTPUT
 
-                  ## genereate reports            
-          # - name: Convert Trivy report to Slack-compatible format
-          #   uses: aquasecurity/trivy-action@0.12.0
-          #   with:
-          #       scan-type: 'convert'
-          #       vuln-type: ""
-          #       image-ref: './trivy-report.json'
-          #       format: 'table'
-          #       output: './trivy-report.txt'
+            ## genereate reports     
+           
+    GenerateReport:
+        needs: fs-scan
+        runs-on: ubuntu-latest    
+        if: ${{ steps.trivy-scan.outputs.exit_code == '1' }}
+        steps:
+          - name: Convert Trivy report to Slack-compatible format
+            uses: aquasecurity/trivy-action@0.12.0
+            with:
+                scan-type: 'convert'
+                vuln-type: ""
+                image-ref: './trivy-report.json'
+                format: 'table'
+                output: './trivy-report.txt'
 
+          - name: Upload trivy report as a Github artifact
+            uses: actions/upload-artifact@v4
+            with:
+              name: trivy-sbom-report
+              path: './trivy-report.txt'
 
-          # - name: Upload trivy report as a Github artifact
-          #   uses: actions/upload-artifact@v4
-          #   with:
-          #     name: trivy-sbom-report
-          #     path: './trivy-report.txt'
-
-          # - name: Upload Trivy report to Slack
-          #   uses: MeilCli/slack-upload-file@v4
-          #   with:
-          #       slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
-          #       channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
-          #       file_path: './trivy-report.txt'
-
+          - name: Upload Trivy report to Slack
+            uses: MeilCli/slack-upload-file@v4
+            with:
+                slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
+                channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
+                file_path: './trivy-report.txt'
 
 
 
@@ -89,40 +90,48 @@ jobs:
 
            #Slack notification (Currently, fomart is wrong)
 
+          # - name: Set Slack message
+          #   id: set-slack-message
+          #   run: |
+          #       SLACK_TITLE="Image build and signed"
+          #       SLACK_MESSAGE="*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL"
+
           - name: Set Slack message
             id: set-slack-message
             run: |
-                SLACK_TITLE="Image build and signed"
-                SLACK_MESSAGE="*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL"
+                echo "::set-output name=message::*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL"
+                echo "::set-output name=title::Your Slack Title"
+
 
           - name: Slack Notification
             uses: rtCamp/action-slack-notify@v2
             env:
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
                 SLACK_MESSAGE: ${{ steps.set-slack-message.outputs.message }}
+                SLACK_TITLE: ${{ steps.set-slack-message.outputs.title }}
 
 
-          - name: Send GitHub Action trigger data to Slack workflow
-            id: slack
-            uses: slackapi/slack-github-action@v1.26.0
-            with:
-                payload: |
-                 { 
-                    "blocks": [
-                    {
-                        "type": "section",
-                        "fields": [
-                        {
-                            "type": "mrkdwn",
-                            "text": "*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{github.server_url}}/${{github.repository}}\n*Image:* <https://hub.docker.com/repository/docker/${{ github.repository }}>"
+          # - name: Send GitHub Action trigger data to Slack workflow
+          #   id: slack
+          #   uses: slackapi/slack-github-action@v1.26.0
+          #   with:
+          #       payload: |
+          #        { 
+          #           "blocks": [
+          #           {
+          #               "type": "section",
+          #               "fields": [
+          #               {
+          #                   "type": "mrkdwn",
+          #                   "text": "*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{github.server_url}}/${{github.repository}}\n*Image:* <https://hub.docker.com/repository/docker/${{ github.repository }}>"
 
-                        }]
-                        }
-                    ]
-                 }
-            env:
-                 SLACK_WEBHOOK_URL: ${{ secrets.P_SLACK_API }}
-                 SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          #               }]
+          #               }
+          #           ]
+          #        }
+          #   env:
+          #        SLACK_WEBHOOK_URL: ${{ secrets.P_SLACK_API }}
+          #        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
 
   
