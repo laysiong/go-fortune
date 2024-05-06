@@ -29,9 +29,8 @@ jobs:
                 severity: 'CRITICAL' #CRITICAL
 
           - name: Upload trivy report as a Github artifact
-            uses: actions/upload-artifact@v4
+            uses: github/codeql-action/upload-artifact@v2
             with:
-                name: trivy-sbom-report
                 sarif_file: 'trivy-report.sarif'
 
           # - name: Read Trivy report file
