@@ -96,11 +96,7 @@ jobs:
           - name: Set Slack message
             id: set-slack-message
             run: |
-                echo "{name}={*Name:* person name
-                *Metriculation:* person number
-                *Email:* person email
-                *Git:* ${{ github.server_url }}/${{ github.repository }}
-                *Image:* Image URL}" >> $GITHUB_OUTPUT
+     
                 echo "{name}={title::Image build and signed}" >> $GITHUB_OUTPUT 
 
 
