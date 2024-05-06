@@ -31,14 +31,17 @@ jobs:
 
           - name: Print exit_code
             run: |
-                if [[ ! -s "./trivy-report.json" ]]; then
-                    echo "::set-output name=has_vulnerabilities::true"
+                VULNS=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
+                if echo $VULNS | grep -q 'true'; then
+                  echo "Vulnerabilities found, creating issue"
+                  echo "results=$(cat ./trivy-report.json)" >> $GITHUB_OUTPUT
                 else
-                    echo "::set-output name=has_vulnerabilities::false"
+                  echo "No vulnerabilities found, halting"
+                  echo "results=nothing" >> $GITHUB_OUTPUT
                 fi
 
           - name: Convert Trivy report to Slack-compatible format
-            if: ${{ steps.check-trivy-report.outputs.has_vulnerabilities == 'true' }}
+            if: ${{ steps.trivy-scan.outputs.exit_code == '1' }}
             uses: aquasecurity/trivy-action@0.12.0
             with:
                 scan-type: 'convert'
@@ -48,14 +51,14 @@ jobs:
                 output: './trivy-report.txt'
 
           - name: Upload trivy report as a Github artifact
-            if: ${{ steps.check-trivy-report.outputs.has_vulnerabilities == 'true' }}
+            if: ${{ steps.trivy-scan.outputs.exit_code == '1' }}
             uses: actions/upload-artifact@v4
             with:
               name: trivy-sbom-report
               path: './trivy-report.txt'
 
           - name: Upload Trivy report to Slack
-            if: ${{ steps.check-trivy-report.outputs.has_vulnerabilities == 'true' }}
+            if: ${{ steps.trivy-scan.outputs.exit_code == '1' }}
             uses: MeilCli/slack-upload-file@v4
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
@@ -110,7 +113,7 @@ jobs:
           - name: Slack_Summary
             id: Slack_Summary
             run: |
-              if [[ "${{ steps.check-trivy-report.outputs.has_vulnerabilities }}" == 'true' ]]; then
+              if [[ "${{ steps.trivy-scan.outputs.exit_code }}" == "1" ]]; then
                   slack_message="Failed trivy scan, see uploaded report"
                 else
                   slack_message="* Name:* person name
