@@ -76,7 +76,7 @@ jobs:
               # Login to Docker Hub
               echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
               # Push the Docker image to Docker Hub
-              docker push ${{ github.repository }}:$(git rev-parse --short HEAD)
+              docker push ${{ github.repository }}@$(docker inspect --format='{{index .RepoDigests 0}}' ${{ github.repository }}:$(git rev-parse --short HEAD))
 
 
               #consign generate-key-pairs
