@@ -93,12 +93,19 @@ jobs:
             run: |
               cosign generate-key-pair
 
+          - name: Get Docker image digest
+            id: get-digest
+            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
+            run: |
+                DIGEST=$(docker manifest inspect ${{ github.repository }}:${{ github.run_id }} | jq -r '.config.digest')
+                echo "::set-output name=digest::$DIGEST"
+
           - name: Sign Docker Image
             if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             run: |
-              cosign sign --key cosign.key ${{ github.repository }}:${{github.run_id}}
+                cosign sign --key cosign.key ${{ github.repository }}@sha256:${{ steps.get-digest.outputs.digest }}
             env:
-              COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+                COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
 
 
