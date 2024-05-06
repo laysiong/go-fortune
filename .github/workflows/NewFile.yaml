@@ -27,11 +27,11 @@ jobs:
                 format: 'json' ## i try table, could not work
                 output: './trivy-report.json'
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
-                severity: 'HIGH' #CRITICAL
+                severity: 'CRITICAL' #CRITICAL
 
           - name: Check Trivy exit code
             id: check-trivy-exit-code
-            run: echo "::set-output name=trivy_exit_code::${{ steps.trivy-scan.outputs.exit_code }}"
+            run: echo "{name}=trivy_exit_code::${{ steps.trivy-scan.outputs.exit_code }}" >> $GITHUB_OUTPUT
 
                   ## genereate reports            
           # - name: Convert Trivy report to Slack-compatible format
