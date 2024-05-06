@@ -93,19 +93,19 @@ jobs:
           #       SLACK_TITLE="Image build and signed"
           #       SLACK_MESSAGE="*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL"
 
-          - name: Set Slack message
-            id: set-slack-message
-            run: |
-                printf "::set-output name=message::\n*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL\n"
-                echo "::set-output name=title::Image build and signed"
+          # - name: Set Slack message
+          #   id: set-slack-message
+          #   run: |
+          #       printf "::set-output name=message::\n*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL\n"
+          #       echo "::set-output name=title::Image build and signed"
 
 
           - name: Slack Notification
             uses: rtCamp/action-slack-notify@v2
             env:
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
-                SLACK_MESSAGE: ${{ steps.set-slack-message.outputs.message }}
-                SLACK_TITLE: ${{ steps.set-slack-message.outputs.title }}
+                SLACK_MESSAGE: '*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL\n"'
+                SLACK_TITLE: 'Image build and signed"'
 
 
           # - name: Send GitHub Action trigger data to Slack workflow
