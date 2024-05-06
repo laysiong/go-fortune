@@ -76,7 +76,10 @@ jobs:
              cosign generate-key-pair
 
 
-  
+            ## Error is file path directionary
+          # - name: Sign Docker Image
+          #   run: |
+          #       cosign sign --key cosign.key ${{ github.repository }}:${{ github.event.head_commit.message }}
       
 
      
