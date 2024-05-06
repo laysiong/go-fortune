@@ -27,7 +27,7 @@ jobs:
                 format: 'json' ## i try table, could not work
                 output: './trivy-report.json'
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
-                severity: 'CRITICAL' #CRITICAL
+                severity: 'HIGH' #CRITICAL
 
 
 
@@ -101,25 +101,28 @@ jobs:
 
 
 
-
-          - name: Summary
-            id: summary
+          - name: Slack_Summary
+            id: Slack_Summary
             run: |
-              slack_message="*  Name:* person name
-              *  Metriculation:* 2
-              *  Email:* 3
-              *  Git:* ${{ github.server_url }}/${{ github.repository }}
-              *  Image:* Image URL"
+              if [[ "${{ steps.trivy-scan.outputs.exit_code }}" == "1" ]]; then
+                  slack_message="Failed trivy scan, see uploaded report"
+                else
+                  slack_message="*Name:* person name
+                  * Metriculation:* 2
+                  * Email:* 3
+                  * Git:* ${{ github.server_url }}/${{ github.repository }}
+                  * Image:* Image URL"
+                fi
 
-              echo 'slack-message<<EOF' >> $GITHUB_OUTPUT
-              echo "$slack_message" >> $GITHUB_OUTPUT
-              echo 'EOF' >> $GITHUB_OUTPUT
+                echo 'slack-message<<EOF' >> $GITHUB_OUTPUT
+                echo "$slack_message" >> $GITHUB_OUTPUT
+                echo 'EOF' >> $GITHUB_OUTPUT
 
           - name: Slack Notification
             uses: rtCamp/action-slack-notify@v2
             env:
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
-                SLACK_MESSAGE: ${{ steps.summary.outputs.slack-message }}
+                SLACK_MESSAGE: ${{ steps.Slack_Summary.outputs.slack-message }}
                 SLACK_TITLE: 'Image build and signed'
 
 
