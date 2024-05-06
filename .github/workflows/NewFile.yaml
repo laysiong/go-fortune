@@ -26,12 +26,10 @@ jobs:
                 scan-ref: '.'
                 exit-code: '1'
                 severity: 'CRITICAL' 
+
               
             #if success, docker build -t <acc name>/my-app:<git commit>
-            # Docker push <acct name> / my-app:<git-commit> push image to docker
-    docker:
-          runs-on: ubuntu-latest    
-          steps:
+            # Docker push <acct name> / my-app:<git-commit> push image to docker 
           - name: Set up QEMU
             uses: docker/setup-qemu-action@v3
       
@@ -51,12 +49,8 @@ jobs:
               tags: ${{ github.repository }}
 
 
-       
             #consign generate key pairs
             #consign sign--key consign.key <account>/myapp:<git-commit>
-    sign_image:
-        runs-on: ubuntu-latest
-        steps:
           - name: Generate Cosign Key Pairs
             id: generate_keys
             run: |
@@ -75,41 +69,38 @@ jobs:
                COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
 
-    slack_not:
-          runs-on: ubuntu-latest    
-          steps:
-              - name: Set Slack message
-                id: set-slack-message
-                run: |
-                 SLACK_TITLE="Image build and signed"
-                 SLACK_MESSAGE="*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL"
+           #Slack notification
+          - name: Set Slack message
+            id: set-slack-message
+            run: |
+                SLACK_TITLE="Image build and signed"
+                SLACK_MESSAGE="*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL"
 
-              - name: Slack Notification
-                uses: rtCamp/action-slack-notify@v2
-                env:
-                    SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
-                    SLACK_MESSAGE: ${{ steps.set-slack-message.outputs.message }}
+          - name: Slack Notification
+            uses: rtCamp/action-slack-notify@v2
+            env:
+                SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
+                SLACK_MESSAGE: ${{ steps.set-slack-message.outputs.message }}
 
 
-              - name: Send GitHub Action trigger data to Slack workflow
-                id: slack
-                uses: slackapi/slack-github-action@v1.26.0
-                with:
-                     payload: |
-                      { 
-      
-                        "blocks": [
-                            {
-                              "type": "section",
-                              "fields": [
-                                {
-                                  "type": "mrkdwn",
-                                  "text": "*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{github.server_url}}/${{github.repository}}\n*Image:* <https://hub.docker.com/repository/docker/${{ github.repository }}>"
+          - name: Send GitHub Action trigger data to Slack workflow
+            id: slack
+            uses: slackapi/slack-github-action@v1.26.0
+            with:
+                payload: |
+                 { 
+                    "blocks": [
+                    {
+                        "type": "section",
+                        "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{github.server_url}}/${{github.repository}}\n*Image:* <https://hub.docker.com/repository/docker/${{ github.repository }}>"
 
-                                }]
-                             }
-                        ]
-                      }
-                env:
-                    SLACK_WEBHOOK_URL: ${{ secrets.P_SLACK_API }}
-                    SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+                        }]
+                        }
+                    ]
+                 }
+            env:
+                 SLACK_WEBHOOK_URL: ${{ secrets.P_SLACK_API }}
+                 SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
