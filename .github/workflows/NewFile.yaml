@@ -39,7 +39,6 @@ jobs:
             uses: MeilCli/slack-upload-file@v4
             with:
                 slack_token: ${{ secrets.P_SLACK_API }}
-                channel_id: ${{ secrets.P_SLACK_CHANNEL_ID }} 
                 file_path: 'trivy-report.json'
 
 
