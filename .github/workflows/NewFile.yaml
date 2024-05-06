@@ -30,9 +30,10 @@ jobs:
 
         #
           - name: Upload trivy report as a Github artifact
-            uses: github/codeql-action/upload-artifact@v4
+            uses: github/codeql-action/upload-sarif@v2
             with:
-                sarif_file: 'trivy-report.sarif'
+                sarif_file: 'trivy-results.sarif'
+
 
           # - name: Read Trivy report file
           #   id: read-report
