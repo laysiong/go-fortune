@@ -24,14 +24,9 @@ jobs:
             with:
                 scan-type: 'fs'
                 scan-ref: '.'
-                output: 'trivy-results.sarif'
-                severity: 'CRITICAL' 
+                output: 'trivy-report.json'
+                severity: 'HIGH' #CRITICAL
 
-          ## upload report file to slack
-          - name: Upload Trivy scan results to GitHub Security tab
-            uses: github/codeql-action/upload-sarif@v3
-            with: 
-               sarif_file: './trivy-results.sarif'   # Update the file path if necessary
 
 
             #install Cosign
@@ -59,22 +54,26 @@ jobs:
           
             #consign generate key pairs
             #consign sign--key consign.key <account>/myapp:<git-commit>
-          - name: Generate Cosign Key Pairs
-            id: generate_keys
-            run: |
-              cosign generate-key-pair github://laysiong/go-fortune
+          # - name: Generate Cosign Key Pairs
+          #   id: generate_keys
+          #   run: |
+          #     cosign generate-key-pair github://laysiong/go-fortune
 
 
-            ## Error is file path directionary
-          - name: Sign Docker Image
-            run: |
-                cosign sign --key cosign.key ${{ github.repository }}:${{ github.event.head_commit.message }}
-            env:
-               COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          #   ## Error is file path directionary
+          # - name: Sign Docker Image
+          #   run: |
+          #       cosign sign --key cosign.key ${{ github.repository }}:${{ github.event.head_commit.message }}
+          #   env:
+          #      COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
-
-
-
+     
+          - name: Upload Trivy report to Slack on failure
+            if: failure()
+            uses: rtCamp/action-slack-notify@v3
+            with:
+                slack_webhook: ${{ secrets.P_SLACK_API }}
+                attachments: trivy-report.json
 
 
            #Slack notification (Currently, fomart is wrong)
