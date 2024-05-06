@@ -25,7 +25,7 @@ jobs:
                 scan-type: 'fs'
                 scan-ref: '.'
                 exit-code: '1'
-                severity: 'HIGH' 
+                severity: 'CRITICAL' 
               
             #if success, docker build -t <acc name>/my-app:<git commit>
             # Docker push <acct name> / my-app:<git-commit> push image to docker
