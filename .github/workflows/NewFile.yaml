@@ -24,8 +24,8 @@ jobs:
             with:
                 scan-type: 'fs'
                 scan-ref: '.'
-                format: 'table'
-                output: 'trivy-report.txt'
+                format: 'json'
+                output: 'trivy-report.json'
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
                 severity: 'CRITICAL' #CRITICAL
 
@@ -33,14 +33,14 @@ jobs:
             uses: actions/upload-artifact@v4
             with:
               name: trivy-sbom-report
-              path: '${{ github.workspace }}/trivy-report.txt'
+              path: '${{ github.workspace }}/trivy-report.json'
 
           - name: Upload Trivy report to Slack
             uses: MeilCli/slack-upload-file@v4
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
                 channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
-                file_path: '${{ github.workspace }}/trivy-report.txt'
+                file_path: '${{ github.workspace }}/trivy-report.json'
 
             #install Cosign
           # - name: Install Cosign
