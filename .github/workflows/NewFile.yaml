@@ -61,9 +61,9 @@ jobs:
               username: ${{ secrets.DOCKERHUB_USERNAME }}
               password: ${{ secrets.DOCKERHUB_TOKEN }}
           - run: |
-                echo "${{ github.repository }}:${{ github.event.head_commit.message }}"
-                docker build . -t ${{github.repository }}:${{ github.event.head_commit.message }}
-                docker push ${{ github.repository }}:${{ github.event.head_commit.message }}
+                #echo "${{ github.repository }}:${{ github.event.head_commit.message }}"
+                docker build . -t ${{github.repository }}:$(git rev-parse --short HEAD)
+                docker push ${{ github.repository }}:$(git rev-parse --short HEAD)
 
           #
             #consign generate key pairs
@@ -76,8 +76,20 @@ jobs:
 
           - name: Sign Docker Image
             run: |
-                cosign sign --key cosign.key ${{ github.repository }}:${{ github.event.head_commit.message }}
-   
+                cosign sign --key cosign.key ${{ github.repository }}:$(git rev-parse --short HEAD)
+            env:
+                COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+
+
+          - name: Upload Trivy report and signed image to Slack
+            uses: MeilCli/slack-upload-file@v4
+            with:
+              slack_token: ${{ secrets.P_SLACK_BOT_TOKEN }}
+              channel_id: ${{ secrets.P_SLACK_CHANNEL_ID }}
+              file_path: '${{ github.workspace }}/trivy-report.json'
+
+
+
 
 
            #Slack notification (Currently, fomart is wrong)
