@@ -1,5 +1,5 @@
 name: Build and Push
-#
+
 #trigger
 on:
    push:
@@ -39,7 +39,7 @@ jobs:
             uses: MeilCli/slack-upload-file@v4
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
-                channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
+                channel_id: C06R69Q0LT1
                 file_path: './test.txt'
 
             #install Cosign
