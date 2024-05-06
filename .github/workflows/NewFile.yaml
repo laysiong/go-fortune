@@ -27,7 +27,7 @@ jobs:
                 format: 'json' ## i try table, could not work
                 output: './trivy-report.json'
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
-                severity: 'CRITICAL' #CRITICAL
+                severity: 'HIGH' #CRITICAL
 
           - name: Set VULNS output
             id: set-vulns-output
@@ -43,8 +43,6 @@ jobs:
                 image-ref: './trivy-report.json'
                 format: 'table'
                 output: './trivy-report.txt'
-
-
 
 
             #install Cosign
