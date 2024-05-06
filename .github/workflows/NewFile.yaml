@@ -48,11 +48,13 @@ jobs:
 
 
             #install Cosign
-          # - name: Install Cosign
-          #   uses: sigstore/cosign-installer@v3.5.0
+          - name: Install Cosign
+            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
+            uses: sigstore/cosign-installer@v3.5.0
             
-
+            #docker push <acct name/my-app:<git-commit>
           # - name: Build and push Docker image
+          #   if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
           #   uses: docker/build-push-action@v2
           #   with:
           #     username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -60,36 +62,41 @@ jobs:
           #     repository: ${{ github.repository }}
           #     tag_with_ref: true
       
-          # - name: Generate Cosign Key Pairs
-          #   id: generate_keys
-          #   run: |
-          #     cosign generate-key-pair
+          - name: Build Docker image
+            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
+            run: |
+              # Use GitHub commit hash as the image tag
+              IMAGE_TAG=$(git rev-parse --short HEAD)
+              # Build the Docker image
+              docker build -t ${{ github.repository }}:$IMAGE_TAG .
 
-          # - name: Sign Docker Image
-          #   run: |
-          #     cosign sign --key cosign.key ${{ github.repository }}:${{ github.sha }}
-          #   env:
-          #     COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-
-
-
-
-           #Slack notification (Currently, fomart is wrong)
-
-          # - name: Set Slack message
-          #   id: set-slack-message
-          #   run: |
-          #       SLACK_TITLE="Image build and signed"
-          #       SLACK_MESSAGE="*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL"
-
-          # - name: Set Slack message
-          #   id: set-slack-message
-          #   run: |
-          #       printf "::set-output name=message::\n*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL\n"
-          #       echo "::set-output name=title::Image build and signed"
+          - name: Push Docker image to Docker Hub
+            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
+            run: |
+              # Login to Docker Hub
+              echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+              # Push the Docker image to Docker Hub
+              docker push ${{ github.repository }}:$(git rev-parse --short HEAD)
 
 
+              #consign generate-key-pairs
+              #consign sign --key cosign.key <acct_name>/myapp:<git-commit>
+          - name: Generate Cosign Key Pairs
+            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
+            id: generate_keys
+            run: |
+              cosign generate-key-pair
 
+          - name: Sign Docker Image
+            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
+            run: |
+              cosign sign --key cosign.key ${{ github.repository }}:$(git rev-parse --short HEAD)
+            env:
+              COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+
+
+
+          #Slack Notifcaiton
           - name: Slack_Summary
             id: Slack_Summary
             run: |
