@@ -29,15 +29,8 @@ jobs:
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
                 severity: 'CRITICAL' #CRITICAL
 
-          - name: Check if vulnerabilities were found
-            run: |
-                trivy_report=$(<./trivy-report.json)
-                if [[ $(echo "$trivy_report" | jq '.[] | select(.Vulnerabilities != null) | .Vulnerabilities | length') -gt 0 ]]; then
-                  echo "Vulnerabilities were found!"
-                  # Additional actions or notifications can be added here
-                else
-                  echo "No vulnerabilities were found."
-                fi
+          - name: Print exit_code
+            run: echo "Trivy exit_code:${{ steps.trivy-scan.outputs.exit_code }}"
 
 
           - name: Convert Trivy report to Slack-compatible format
