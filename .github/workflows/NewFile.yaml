@@ -27,7 +27,7 @@ jobs:
                 format: 'json' ## i try table, could not work
                 output: './trivy-report.json'
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
-                severity: 'HIGH' #CRITICAL
+                severity: 'CRITICAL' #CRITICAL
 
           - name: Check if vulnerabilities were found
             run: |
