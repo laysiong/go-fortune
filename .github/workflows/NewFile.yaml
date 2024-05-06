@@ -27,7 +27,7 @@ jobs:
                 format: 'json' ## i try table, could not work
                 output: './trivy-report.json'
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
-                severity: 'HIGH' #CRITICAL
+                severity: 'LOW' #CRITICAL
 
 
 
@@ -107,7 +107,7 @@ jobs:
               if [[ "${{ steps.trivy-scan.outputs.exit_code }}" == "1" ]]; then
                   slack_message="Failed trivy scan, see uploaded report"
                 else
-                  slack_message="*Name:* person name
+                  slack_message="* Name:* person name
                   * Metriculation:* 2
                   * Email:* 3
                   * Git:* ${{ github.server_url }}/${{ github.repository }}
