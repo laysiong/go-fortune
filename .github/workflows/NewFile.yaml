@@ -31,7 +31,7 @@ jobs:
           - name: Install Cosign
             uses: sigstore/cosign-installer@v3.5.0
             
-            #if success, docker build -t <acc name>/my-app:<git commit>
+            #docker build -t <acc name>/my-app:<git commit>
             # Docker push <acct name> / my-app:<git-commit> push image to docker 
           - name: Set up QEMU
             uses: docker/setup-qemu-action@v3
@@ -39,19 +39,17 @@ jobs:
           - name: Set up Docker Buildx
             uses: docker/setup-buildx-action@v3
       
-          - name: Login to Docker Hub
+          - name: Build and push
             uses: docker/login-action@v3
             with:
               username: ${{ secrets.DOCKERHUB_USERNAME }}
               password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
-          - name: Build and push
-            uses: docker/build-push-action@v5
-            with:
-              push: true
-              tags: ${{ github.repository }}:${{ github.event.head_commit.message }}
+          - run: |
+                echo ${{  github.repository }}::${{ github.event.head_commit.message }}
+                docker build . -t ${{  github.repository }}::${{ github.event.head_commit.message }}
+                docker push ${{  github.repository }}::${{ github.event.head_commit.message }}
 
-              #
+
             #consign generate key pairs
             #consign sign--key consign.key <account>/myapp:<git-commit>
           - name: Generate Cosign Key Pairs
@@ -60,9 +58,10 @@ jobs:
               cosign generate-key-pair
 
 
+            ## Error is file path directionary
           - name: Sign Docker Image
             run: |
-              cosign sign --key cosign.key <account>/myapp:${{ github.event.head_commit.message }}
+              cosign sign --key cosign.key ${{ github.repository }}:${{ github.event.head_commit.message }}
             env:
                COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
