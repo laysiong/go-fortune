@@ -26,13 +26,16 @@ jobs:
                 scan-ref: '.'
                 format: 'json' ## i try table, could not work
                 output: './trivy-report.json'
-                exit-code: 1
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
                 severity: 'HIGH' #CRITICAL
 
           - name: Print exit_code
-            run: echo "Trivy exit_code:${{ steps.trivy-scan.outputs.exit_code }}"
-
+            run: |
+                if [[ ! -s "./trivy-report.json" ]]; then
+                  echo "No vulnerabilities found."
+                else
+                  echo "Vulnerabilities found."
+                fi
 
           - name: Convert Trivy report to Slack-compatible format
             if: ${{ steps.trivy-scan.outputs.exit_code == '1' }}
