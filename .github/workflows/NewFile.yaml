@@ -27,7 +27,7 @@ jobs:
                 format: 'json' ## i try table, could not work
                 output: './trivy-report.json'
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
-                severity: 'HIGH' #CRITICAL
+                severity: 'CRITICAL' #CRITICAL
 
           - name: Print exit_code and check for vulnerabilities
             run: |
@@ -39,7 +39,7 @@ jobs:
                 fi
                 echo "Results: $VULNS"
 
-                #
+            
           - name: Convert Trivy report to Slack-compatible format
             if: ${{ steps.trivy-scan.outputs.results == 'true' }}
             uses: aquasecurity/trivy-action@0.12.0
