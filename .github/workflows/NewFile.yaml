@@ -24,8 +24,8 @@ jobs:
             with:
                 scan-type: 'fs'
                 scan-ref: '.'
-                output: 'trivy-report.json'
-                severity: 'HIGH' #CRITICAL
+                output: 'trivy-report.txt'
+                severity: 'CRITICAL' #CRITICAL
 
 
 
@@ -69,11 +69,12 @@ jobs:
 
      
           - name: Upload Trivy report to Slack on failure
-            if: failure()
-            uses: rtCamp/action-slack-notify@v2
+           #if: failure()
+            uses: MeilCli/slack-upload-file@v4
             with:
-                slack_webhook: ${{ secrets.P_SLACK_API }}
-                attachments: trivy-report.json
+                channel: ${{ secrets.P_SLACK_API }} 
+                token: ${{ secrets.P_SLACK_BOT_TOKEN }}
+                attachments: trivy-report.txt
 
 
            #Slack notification (Currently, fomart is wrong)
