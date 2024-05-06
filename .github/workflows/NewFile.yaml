@@ -29,19 +29,19 @@ jobs:
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
                 severity: 'HIGH' #CRITICAL
 
-          - name: Print exit_code
+          - name: Print exit_code and check for vulnerabilities
             run: |
                 VULNS=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
                 if echo $VULNS | grep -q 'true'; then
-                  echo "Vulnerabilities found, creating issue"
                   echo "results=1" >> $GITHUB_OUTPUT
                 else
-                  echo "No vulnerabilities found, halting"
                   echo "results=0" >> $GITHUB_OUTPUT
                 fi
+                echo "Results: $VULNS"
+
 
           - name: Convert Trivy report to Slack-compatible format
-            if: ${{ steps.trivy-scan.outputs.results  == 1 }}
+            if: ${{ steps.trivy-scan.outputs.results == '1' }}
             uses: aquasecurity/trivy-action@0.12.0
             with:
                 scan-type: 'convert'
