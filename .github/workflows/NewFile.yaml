@@ -40,7 +40,7 @@ jobs:
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
                 channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
-                file_path: '../test.txt'
+                file_path: './test.txt'
 
             #install Cosign
           # - name: Install Cosign
