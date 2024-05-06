@@ -87,11 +87,8 @@ jobs:
 
 
 
-    slack-notification:
            #Slack notification (Currently, fomart is wrong)
-          needs: build-and-scan
-          runs-on: ubuntu-latest
-          steps:
+
           - name: Set Slack message
             id: set-slack-message
             run: |
