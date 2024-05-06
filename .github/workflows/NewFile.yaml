@@ -1,5 +1,5 @@
 name: Build and Push
-
+#
 #trigger
 on:
    push:
@@ -19,28 +19,28 @@ jobs:
 
 
             #Trivy fs -s file(.)
-          # - name: Run Trivy vulnerability scanner in fs mode
-          #   uses: aquasecurity/trivy-action@master
-          #   with:
-          #       scan-type: 'fs'
-          #       scan-ref: '.'
-          #       format: 'json'
-          #       output: 'trivy-report.json'
-          #       github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
-          #       severity: 'CRITICAL' #CRITICAL
+          - name: Run Trivy vulnerability scanner in fs mode
+            uses: aquasecurity/trivy-action@master
+            with:
+                scan-type: 'fs'
+                scan-ref: '.'
+                format: 'json'
+                output: 'trivy-report.json'
+                github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
+                severity: 'CRITICAL' #CRITICAL
 
-          # - name: Upload trivy report as a Github artifact
-          #   uses: actions/upload-artifact@v4
-          #   with:
-          #     name: trivy-sbom-report
-          #     path: '${{ github.workspace }}/trivy-report.json'
+          - name: Upload trivy report as a Github artifact
+            uses: actions/upload-artifact@v4
+            with:
+              name: trivy-sbom-report
+              path: '${{ github.workspace }}/trivy-report.json'
 
           - name: Upload Trivy report to Slack
             uses: MeilCli/slack-upload-file@v4
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
-                channel_id: C06R69Q0LT1
-                file_path: './test.txt'
+                channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
+                file_path: '${{ github.workspace }}/trivy-report.json'
 
             #install Cosign
           # - name: Install Cosign
