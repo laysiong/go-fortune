@@ -1,5 +1,5 @@
 name: Build and Push
-
+#
 #trigger
 on:
    push:
@@ -40,8 +40,7 @@ jobs:
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
                 channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
-                file_path: 'test.txt'
-                initial_comment: 'here!'
+                file_path: '../test.txt'
 
             #install Cosign
           # - name: Install Cosign
