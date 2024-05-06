@@ -100,14 +100,26 @@ jobs:
           #       echo "::set-output name=title::Image build and signed"
 
 
+
+
+          - name: Summary
+            id: summary
+            run: |
+              slack_message="*  Name:* person name
+              *  Metriculation:* 2
+              *  Email:* 3
+              *  Git:* ${{ github.server_url }}/${{ github.repository }}
+              *  Image:* Image URL"
+
+              echo 'slack-message<<EOF' >> $GITHUB_OUTPUT
+              echo "$slack_message" >> $GITHUB_OUTPUT
+              echo 'EOF' >> $GITHUB_OUTPUT
+
           - name: Slack Notification
             uses: rtCamp/action-slack-notify@v2
             env:
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
-                SLACK_MESSAGE: '*Name:* person name*
-                                *Metriculation:* person number
-                                *Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}
-                                *Image:* Image URL\n"'
+                SLACK_MESSAGE: ${{ steps.summary.outputs.slack-message }}
                 SLACK_TITLE: 'Image build and signed'
 
 
