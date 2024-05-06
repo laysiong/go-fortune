@@ -74,11 +74,11 @@ jobs:
                  cosign generate-key-pair
 
 
-          - name: Sign Docker Image
-            run: |
-                cosign sign --key cosign.key ${{ github.repository }}:$(git rev-parse --short HEAD)
-            env:
-                COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          # - name: Sign Docker Image
+          #   run: |
+          #       cosign sign --key cosign.key ${{ github.repository }}:$(git rev-parse --short HEAD)
+          #   env:
+          #       COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
 
           - name: Upload Trivy report and signed image to Slack
