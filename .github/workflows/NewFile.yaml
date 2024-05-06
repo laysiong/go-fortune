@@ -31,7 +31,7 @@ jobs:
           - name: Install Cosign
             uses: sigstore/cosign-installer@v3.5.0
             
-            #docker build -t <acc name>/my-app:<git commit>
+            #docker build -t <acc name>/my-app:<git commit> #
             # Docker push <acct name> / my-app:<git-commit> push image to docker 
           - name: Set up QEMU
             uses: docker/setup-qemu-action@v3
@@ -49,7 +49,7 @@ jobs:
                 docker build . -t ${{  github.repository }}::${{ github.event.head_commit.message }}
                 docker push ${{  github.repository }}::${{ github.event.head_commit.message }}
 
-
+          
             #consign generate key pairs
             #consign sign--key consign.key <account>/myapp:<git-commit>
           - name: Generate Cosign Key Pairs
