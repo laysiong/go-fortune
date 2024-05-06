@@ -103,7 +103,7 @@ jobs:
           - name: Sign Docker Image
             if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             run: |
-                cosign sign --key cosign.key ${{ github.repository }}@sha256:${{ steps.get-digest.outputs.digest }}
+                cosign sign --key cosign.key ${{ github.repository }}@${{ steps.get-digest.outputs.digest }}
             env:
                 COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
