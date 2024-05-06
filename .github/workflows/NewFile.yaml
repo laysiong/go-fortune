@@ -29,18 +29,29 @@ jobs:
                 github-pat: ${{ secrets.MY_API }} # or ${{ secrets.github_pat_name }} if you're using a PAT
                 severity: 'HIGH' #CRITICAL
 
+
+          - name: Convert Trivy report to Slack-compatible format
+            uses: aquasecurity/trivy-action@0.12.0
+            with:
+                scan-type: 'convert'
+                vuln-type: ""
+                image-ref: './trivy-report.json'
+                format: 'table'
+                output: './trivy-report.txt'
+
+
           - name: Upload trivy report as a Github artifact
             uses: actions/upload-artifact@v4
             with:
               name: trivy-sbom-report
-              path: './trivy-report.json'
+              path: './trivy-report.txt'
 
           - name: Upload Trivy report to Slack
             uses: MeilCli/slack-upload-file@v4
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
                 channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
-                file_path: './trivy-report.json'
+                file_path: './trivy-report.txt'
 
             #install Cosign
           # - name: Install Cosign
