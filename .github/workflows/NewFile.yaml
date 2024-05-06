@@ -96,12 +96,8 @@ jobs:
           - name: Set Slack message
             id: set-slack-message
             run: |
-                echo "::set-output name=message::*Name:* person name
-                *Metriculation:* person number
-                *Email:* person email
-                *Git:* ${{ github.server_url }}/${{ github.repository }}
-                *Image:* Image URL"
-                echo "::set-output name=title::Image bild and signed"
+                printf "::set-output name=message::\n*Name:* person name\n*Metriculation:* person number\n*Email:* person email\n*Git:* ${{ github.server_url }}/${{ github.repository }}\n*Image:* Image URL\n"
+                echo "::set-output name=title::Image build and signed"
 
 
           - name: Slack Notification
