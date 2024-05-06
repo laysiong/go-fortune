@@ -1,6 +1,6 @@
 name: Build and Push
 
-#trigge
+#trigg
 on:
    push:
      branches:
