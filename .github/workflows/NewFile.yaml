@@ -30,6 +30,7 @@ jobs:
                 severity: 'HIGH' #CRITICAL
 
           - name: Print exit_code and check for vulnerabilities
+            id: vul-output
             run: |
                 VULNS=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
                 if echo $VULNS | grep -q 'true'; then
@@ -39,9 +40,9 @@ jobs:
                 fi
                 echo "Results: $VULNS"
 
-            
+             
           - name: Convert Trivy report to Slack-compatible format
-            if: ${{ VULNS == 'true' }}
+            if: ${{ steps.vul-output.outputs.results == 'true' }}
             uses: aquasecurity/trivy-action@0.12.0
             with:
                 scan-type: 'convert'
@@ -51,14 +52,14 @@ jobs:
                 output: './trivy-report.txt'
 
           - name: Upload trivy report as a Github artifact
-            if: ${{ VULNS == 'true' }}
+            if: ${{ steps.vul-output.outputs.results == 'true' }}
             uses: actions/upload-artifact@v4
             with:
               name: trivy-sbom-report
               path: './trivy-report.txt'
 
           - name: Upload Trivy report to Slack
-            if: ${{ VULNS == 'true' }}
+            if: ${{ steps.vul-output.outputs.results == 'true' }}
             uses: MeilCli/slack-upload-file@v4
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
