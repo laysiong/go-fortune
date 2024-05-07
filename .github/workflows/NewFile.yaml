@@ -76,7 +76,7 @@ jobs:
             if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             run: |
                 DIGEST=$(docker manifest inspect ${{ github.repository }}:${{ github.run_id }} | jq -r '.config.digest')
-                echo "::set-output name=digest::$DIGEST"
+                echo "digest = $DIGEST">> $GITHUB_OUTPUT
 
           - name: Sign Docker Image
             if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
