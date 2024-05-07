@@ -1,6 +1,6 @@
 name: Build and Push
 
-#test
+#S1_Critical
 #trigger
 on:
    push:
