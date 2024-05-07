@@ -1,5 +1,6 @@
 name: Build and Push
 
+
 #trigg
 on:
    push:
@@ -34,28 +35,20 @@ jobs:
             run: |
                 vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
                 echo "$vulns_value"
-                echo "vulns=${vulns_value}" >> $GITHUB_OUTPUT
-
-             
-          - name: Convert Trivy report to Slack-compatible format
-            if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
-            uses: aquasecurity/trivy-action@0.12.0
-            with:
-                scan-type: 'convert'
-                vuln-type: ""
-                image-ref: './trivy-report.json'
-                format: 'table'
-                output: './trivy-report.txt'
+                echo "vulns=${vulns_value}" >> GITHUB_ENV            
 
 
+    fsscanGood:
+          runs-on: ubuntu-latest    
+          needs: fs-scan
+          if: ${{ env.VULNS }} != 'true'
+          steps:
             #install Cosign
           - name: Install Cosign
-            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             uses: sigstore/cosign-installer@v3.5.0
             
       
           - name: Log into registry
-            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             uses: docker/login-action@v3
             with:
               username: ${{ secrets.dockerhub_username }}
@@ -63,7 +56,6 @@ jobs:
       
 
           - name: build and push docker image
-            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             id: build-and-push
             uses: docker/build-push-action@v5
             with:
@@ -73,25 +65,20 @@ jobs:
               secrets: |
                 GIT_AUTH_TOKEN=${{ secrets.MY_API }}
 
-
-
               #consign generate-key-pairs
               #consign sign --key cosign.key <acct_name>/myapp:<git-commit>
           - name: Generate Cosign Key Pairs
-            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             id: generate_keys
             run: |
               cosign generate-key-pair
 
           - name: Get Docker image digest
             id: get-digest
-            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             run: |
                 DIGEST=$(docker manifest inspect ${{ github.repository }}:${{ github.run_id }} | jq -r '.config.digest')
                 echo "::set-output name=digest::$DIGEST"
 
           - name: Sign Docker Image
-            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             run: |
                 cosign sign --key cosign.key ${{ github.repository }}@${{ steps.get-digest.outputs.digest }}
             env:
@@ -99,11 +86,15 @@ jobs:
 
 
 
+    slacknotify:
+          runs-on: ubuntu-latest    
+          needs: fs-scan
+          steps:
           #Slack Notifcaiton
           - name: Slack_Summary
             id: Slack_Summary
             run: |
-              if [[ "${{ steps.set-vulns-output.outputs.vulns }}" == 'true' ]]; then
+              if [[ "${{ env.VULNS }} " == 'true' ]]; then
                   slack_color="danger"    
                   slack_message="Failed trivy scan, see uploaded report"
                   slack_title="Scan failed - Toh Lay Siong"
@@ -133,15 +124,27 @@ jobs:
                 SLACK_MESSAGE: ${{ steps.Slack_Summary.outputs.slack-message }}
                 SLACK_TITLE:  ${{ steps.Slack_Summary.outputs.slack-title }}
 
+
+    gotVulns:
+          runs-on: ubuntu-latest    
+          needs: fs-scan
+          if: ${{ env.VULNS }} == 'true'
+          steps:
+          - name: Convert Trivy report to Slack-compatible format
+            uses: aquasecurity/trivy-action@0.12.0
+            with:
+                scan-type: 'convert'
+                vuln-type: ""
+                image-ref: './trivy-report.json'
+                format: 'table'
+                output: './trivy-report.txt'
           - name: Upload trivy report as a Github artifact
-            if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
             uses: actions/upload-artifact@v4
             with:
               name: trivy-sbom-report
               path: './trivy-report.txt'
 
           - name: Upload Trivy report to Slack
-            if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
             uses: MeilCli/slack-upload-file@v4
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
