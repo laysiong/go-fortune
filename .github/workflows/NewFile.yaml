@@ -41,7 +41,7 @@ jobs:
     fsscanGood:
           runs-on: ubuntu-latest    
           needs: fs-scan
-          if: ${{ needs.fs-scan.outputs.VULNS }} != 'true'
+          if: ${{ needs.fs-scan.outputs.VULNS != 'true'}} 
           steps:
             #install Cosign
           - name: Install Cosign
@@ -94,7 +94,7 @@ jobs:
           - name: Slack_Summary
             id: Slack_Summary
             run: |
-              if [[ "${{ needs.fs-scan.outputs.VULNS }} " == 'true' ]]; then
+              if [[ "${{ needs.fs-scan.outputs.VULNS == 'true'}} "]]; then
                   slack_color="danger"    
                   slack_message="Failed trivy scan, see uploaded report"
                   slack_title="Scan failed - Toh Lay Siong"
@@ -128,7 +128,7 @@ jobs:
     gotVulns:
           runs-on: ubuntu-latest    
           needs: fs-scan
-          if: ${{ needs.fs-scan.outputs.VULNS }} == 'true'
+          if: ${{ needs.fs-scan.outputs.VULNS  == 'true' }}
           steps:
           - name: Convert Trivy report to Slack-compatible format
             uses: aquasecurity/trivy-action@0.12.0
