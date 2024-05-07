@@ -88,7 +88,7 @@ jobs:
             if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             run: |
                 DIGEST=$(docker manifest inspect ${{ github.repository }}:${{ github.run_id }} | jq -r '.config.digest')
-                echo "digest={$DIGEST}" >> $GITHUB_OUTPUT
+                echo "::set-output name=digest::$DIGEST"
 
           - name: Sign Docker Image
             if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
@@ -129,9 +129,11 @@ jobs:
             uses: rtCamp/action-slack-notify@v2
             env:
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
-                SLACK_COLOR: ${{ steps.Slack_Summary.outputs.slack-color }} # or a specific color like 'good' or '#ff00ff'
+                SLACK_COLOR: ${{ steps.Slack_Summary.outputs.slack-color }}
                 SLACK_MESSAGE: ${{ steps.Slack_Summary.outputs.slack-message }}
                 SLACK_TITLE:  ${{ steps.Slack_Summary.outputs.slack-title }}
+
+
 
           - name: Upload trivy report as a Github artifact
             if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
