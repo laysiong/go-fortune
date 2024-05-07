@@ -33,7 +33,10 @@ jobs:
 
           - name: Set VULNS output
             id: set-vulns-output
-            run: echo "name=vulns::$(cat ./trivy-report.json | jq '.Results[] | has(\"Vulnerabilities\")')" >> $GITHUB_OUTPUT
+            run: |
+                vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
+                echo "$vulns_value"
+                echo "vulns::${vulns_value}" >> $GITHUB_OUTPUT
 
           - name: Print set-vulns-output
             run: echo "${{ needs.fs-scan.outputs['set-vulns-output'] }}"
