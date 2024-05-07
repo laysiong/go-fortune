@@ -1,6 +1,6 @@
 name: Build and Push
 
-#S1_HIGH
+
 #trigger
 on:
    push:
