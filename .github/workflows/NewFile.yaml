@@ -33,14 +33,14 @@ jobs:
 
           - name: Set VULNS output
             id: set-vulns-output
-            run: echo "::set-output name=vulns::$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')"
+            run: echo "name=vulns::$(cat ./trivy-report.json | jq '.Results[] | has(\"Vulnerabilities\")')" >> $GITHUB_OUTPUT
 
            
            
     fsscanGood:
           runs-on: ubuntu-latest    
           needs: fs-scan
-          if: "${{  steps.set-vulns-output.outputs.vulns == 'false' }}"
+          if: "${{ needs.fs-scan.outputs['set-vulns-output'] == 'false' }}"
           steps:
                 #install Cosign
             - name: Install Cosign
@@ -108,17 +108,15 @@ jobs:
                 slack_title="Image build and signed"
                 fi
 
-                echo "slack-color=$slack_color" >> $GITHUB_ENV
-                echo 'slack-message<<EOF' >> $GITHUB_OUTPUT
-                echo "$slack_message" >> $GITHUB_OUTPUT
-                echo 'EOF' >> $GITHUB_OUTPUT
-                echo '$slack_title'>>$GITHUB_OUTPUT
+                echo "slack-color=$slack_color" >> $GITHUB_OUTPUT
+                echo "slack-message = $slack_message" >> $GITHUB_OUTPUT
+                echo "slack-title=$slack_title" >> $GITHUB_OUTPUT
 
           - name: Slack Notification
             uses: rtCamp/action-slack-notify@v2
             env:
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
-                SLACK_COLOR: ${{ env.slack-color }} # or a specific color like 'good' or '#ff00ff'
+                SLACK_COLOR: ${{  steps.Slack_Summary.outputs.slack-color }} # or a specific color like 'good' or '#ff00ff'
                 SLACK_MESSAGE: ${{ steps.Slack_Summary.outputs.slack-message }}
                 SLACK_TITLE:  ${{ steps.Slack_Summary.outputs.slack_title }}
    
@@ -126,7 +124,7 @@ jobs:
     gotVulns:
           runs-on: ubuntu-latest    
           needs: fs-scan
-          if: "${{   steps.set-vulns-output.outputs.vulns == 'true' }}"
+          if: "${{ needs.fs-scan.outputs['set-vulns-output'] == 'true' }}"
           steps:
           - name: Convert Trivy report to Slack-compatible format
             uses: aquasecurity/trivy-action@0.12.0
