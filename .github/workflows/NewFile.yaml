@@ -27,7 +27,7 @@ jobs:
                 scan-ref: '.'
                 format: 'json' 
                 output: './trivy-report.json'
-                severity: 'CRITICAL' #CRITICAL
+                severity: 'HIGH' #CRITICAL
 
           - name: Set VULNS output
             id: set-vulns-output
@@ -35,18 +35,6 @@ jobs:
                 vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
                 echo "$vulns_value"
                 echo "vulns=${vulns_value}" >> $GITHUB_OUTPUT
-
-             
-          - name: Convert Trivy report to Slack-compatible format
-            if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
-            uses: aquasecurity/trivy-action@0.12.0
-            with:
-                scan-type: 'convert'
-                vuln-type: ""
-                image-ref: './trivy-report.json'
-                format: 'table'
-                output: './trivy-report.txt'
-
 
           #install Cosign
           - name: Install Cosign
@@ -134,6 +122,16 @@ jobs:
                 SLACK_TITLE:  ${{ steps.Slack_Summary.outputs.slack-title }}
 
 
+          #upload report if vulns is found
+          - name: Convert Trivy report to Slack-compatible format
+            if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
+            uses: aquasecurity/trivy-action@0.12.0
+            with:
+                scan-type: 'convert'
+                vuln-type: ""
+                image-ref: './trivy-report.json'
+                format: 'table'
+                output: './trivy-report.txt'
 
           - name: Upload trivy report as a Github artifact
             if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
