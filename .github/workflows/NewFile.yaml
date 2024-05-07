@@ -25,16 +25,12 @@ jobs:
             with:
                 scan-type: 'fs'
                 scan-ref: '.'
-                format: 'json' 
+                format: 'table' 
+                exit-code: 1
                 output: './trivy-report.json'
                 severity: 'HIGH' #CRITICAL
 
-          - name: Set VULNS output
-            id: set-vulns-output
-            run: |
-                vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
-                echo "$vulns_value"
-                echo "vulns=${vulns_value}" >> $GITHUB_OUTPUT
+                #
 
           #install Cosign
           - name: Install Cosign
