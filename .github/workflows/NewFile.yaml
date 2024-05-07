@@ -1,6 +1,6 @@
 name: Build and Push
 
-#S1_Critical
+#S1_HIGH
 #trigger
 on:
    push:
@@ -27,7 +27,7 @@ jobs:
                 scan-ref: '.'
                 format: 'json' 
                 output: './trivy-report.json'
-                severity: 'CRITICAL' #CRITICAL
+                severity: 'HIGH' #CRITICAL
 
           - name: Set VULNS output
             id: set-vulns-output
