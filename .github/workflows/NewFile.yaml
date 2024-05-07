@@ -32,9 +32,14 @@ jobs:
           - name: Set VULNS output
             id: set-vulns-output
             run: |
-                vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
-                echo "$vulns_value"
-                echo "vulns=${vulns_value}" >> $GITHUB_OUTPUT
+                 # Use jq to count the number of vulnerabilities
+                 vulns_count=$(jq '.Results[] | select(.Vulnerabilities) | length' ./trivy-report.json)
+                 if [[ $vulns_count -gt 0 ]]; then
+                   vulns_value="true"
+                 else
+                   vulns_value="false"
+                 fi
+                 echo "vulns=${vulns_value}" >> $GITHUB_ENV
 
           #install Cosign
           - name: Install Cosign
