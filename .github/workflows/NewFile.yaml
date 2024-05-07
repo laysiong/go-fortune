@@ -78,9 +78,6 @@ jobs:
                 DIGEST=$(docker manifest inspect ${{ github.repository }}:${{ github.run_id }} | jq -r '.config.digest')
                 echo "digest=$DIGEST" >>$GITHUB_OUTPUT
 
-          - name: Debug digest
-            run: echo "${{ steps.get-digest.outputs.digest }}"
-
           - name: Sign Docker Image
             if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
             run: |
