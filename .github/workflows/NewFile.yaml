@@ -7,7 +7,7 @@ on:
         - 'release/v[0-9]+.[0-9]*'
 
 jobs:
-    #name of your job#
+    #name of your job
     fs-scan:
         #runner
         runs-on: ubuntu-latest    
@@ -119,17 +119,19 @@ jobs:
 
                 fi
 
-               echo "slack-color=$slack_color" >> $GITHUB_OUTPUT
-               echo "slack-message = $slack_message" >> $GITHUB_OUTPUT
-               echo "slack-title=$slack_title" >> $GITHUB_OUTPUT
+                echo "slack-color=$slack_color" >> $GITHUB_OUTPUT
+                echo 'slack-message<<EOF' >> $GITHUB_OUTPUT
+                echo "$slack_message" >> $GITHUB_OUTPUT
+                echo 'EOF' >> $GITHUB_OUTPUT
+                echo "slack-title=$slack_title" >> $GITHUB_OUTPUT
 
           - name: Slack Notification
             uses: rtCamp/action-slack-notify@v2
             env:
                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
-                SLACK_COLOR: ${{ env.slack-color }} # or a specific color like 'good' or '#ff00ff'
+                SLACK_COLOR: ${{ steps.Slack_Summary.outputs.slack-color }} # or a specific color like 'good' or '#ff00ff'
                 SLACK_MESSAGE: ${{ steps.Slack_Summary.outputs.slack-message }}
-                SLACK_TITLE:  ${{ steps.Slack_Summary.outputs.slack_title }}
+                SLACK_TITLE:  ${{ steps.Slack_Summary.outputs.slack-title }}
 
           - name: Upload trivy report as a Github artifact
             if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
