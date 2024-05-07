@@ -25,7 +25,7 @@ jobs:
             with:
                 scan-type: 'fs'
                 scan-ref: '.'
-                format: 'json' 
+                format: 'table' 
                 output: './trivy-report.json'
                 severity: 'HIGH' #CRITICAL
 
@@ -147,6 +147,8 @@ jobs:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
                 channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
                 file_path: './trivy-report.txt'
+                initial_comment: 'Scan report by Toh Lay Siong'
+
 
 
 
