@@ -35,12 +35,13 @@ jobs:
             id: set-vulns-output
             run: echo "name=vulns::$(cat ./trivy-report.json | jq '.Results[] | has(\"Vulnerabilities\")')" >> $GITHUB_OUTPUT
 
-           
+          - name: Print set-vulns-output
+            run: echo "${{ needs.fs-scan.outputs['set-vulns-output'] }}"
            
     fsscanGood:
           runs-on: ubuntu-latest    
           needs: fs-scan
-          if: "${{ needs.fs-scan.outputs['set-vulns-output'] == 'false' }}"
+          if: "${{ needs.fs-scan.outputs['set-vulns-output'] != 'true' }}"
           steps:
                 #install Cosign
             - name: Install Cosign
