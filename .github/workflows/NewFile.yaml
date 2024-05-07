@@ -107,7 +107,7 @@ jobs:
                   slack_color="good"
                   slack_message="* Name:* Toh Lay Siong
               * Metriculation:* A0291916W
-              * Email:* mrlaysiong@gmail.com
+              * Email:* E1336249@u.nus.edu
               * Git:* ${{ github.server_url }}/${{ github.repository }}
               * Image:* <https://hub.docker.com/repository/docker/${{ github.repository }}>"
                 fi
@@ -138,7 +138,6 @@ jobs:
             uses: MeilCli/slack-upload-file@v4
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
-                channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
                 file_path: './trivy-report.txt'
 
 
