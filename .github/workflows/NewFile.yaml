@@ -125,7 +125,7 @@ jobs:
     gotVulns:
           runs-on: ubuntu-latest    
           needs: fs-scan
-          if: "${{ steps.set-vulns-output.outputs.vulns == 'true' }}"
+          if: "${{  needs.fs-scan.outputs['set-vulns-ouput'] == 'true' }}"
           steps:
           - name: Convert Trivy report to Slack-compatible format
             uses: aquasecurity/trivy-action@0.12.0
