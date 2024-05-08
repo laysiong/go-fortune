@@ -62,7 +62,6 @@ jobs:
               - name: Install Cosign
                 uses: sigstore/cosign-installer@v3.5.0
             
-      
               - name: Log into registry
                 uses: docker/login-action@v3
                 with:
@@ -120,6 +119,7 @@ jobs:
                       slack_title="Scan failed - Toh Lay Siong"
 
                     else
+
                       slack_color="good"
                       slack_message="* Name:* Toh Lay Siong
                   * Metriculation:* A0291916W
@@ -146,7 +146,7 @@ jobs:
 
     Upload-report:
           #runner
-          needs: [Slack-Notify]
+          needs: [Slack-Notify,fs-scan]
           if: ${{ needs.fs-scan.outputs.vulns == 'true' }}
           runs-on: ubuntu-latest    
           steps:
