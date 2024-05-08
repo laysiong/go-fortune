@@ -13,7 +13,7 @@ jobs:
         #runner
         runs-on: ubuntu-latest    
         outputs:
-          fs-scan-outcome: ${{ steps.set-vulns-output.outputs.vulns }}
+          vulns: ${{ steps.set-vulns-output.outputs.vulns }}
         if: "!startsWith(github.event.head_commit.message, '#NORUN')"
         #steps in this job
         steps:
@@ -37,6 +37,11 @@ jobs:
             run: |
                 vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
                 echo "vulns=${vulns_value}" >> $GITHUB_ENV
+
+          - name: one-2
+            run: |
+                echo ${{ steps.set-vulns-output.outputs.vulns }}
+
 
           #install Cosign
           # - name: Install Cosign
@@ -96,12 +101,12 @@ jobs:
               #Slack Notifcaiton
               - name: Print Variable from Job 1
                 run: |
-                    echo "${{ needs.fs-scan.outputs.fs-scan-outcome }}"
+                    echo "${{ needs.fs-scan.outputs.vulns }}"
 
               - name: Slack_Summary
                 id: Slack_Summary
                 run: |
-                  if [[ "${{ needs.fs-scan.outputs.fs-scan-outcome }}" == 'true' ]]; then
+                  if [[ "${{ needs.fs-scan.outputs.vulns }}" == 'true' ]]; then
                       slack_color="danger"    
                       slack_message="Failed trivy scan, see uploaded report"
                       slack_title="Scan failed - Toh Lay Siong"
