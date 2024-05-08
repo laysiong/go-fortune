@@ -9,11 +9,13 @@ on:
 
 jobs:
     #name of your job
-    scan:
+    one:
         #runner
         runs-on: ubuntu-latest    
         outputs:
-          vulns: ${{ steps.set-vulns-output.outputs.vulns }}
+          #vulns: ${{ steps.set-vulns-output.outputs.vulns }}
+          HELLO: "${{ steps.set-some-stuff.outputs.HELLO }}"
+
         if: "!startsWith(github.event.head_commit.message, '#NORUN')"
         #steps in this job
         steps:
@@ -31,16 +33,23 @@ jobs:
                 output: './trivy-report.json'
                 severity: 'HIGH' #CRITICAL
 
-
-          - name: Set VULNS output
-            id: set-vulns-output
+          - name: one-1
+            id: set-some-stuff
             run: |
-                vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
-                echo "vulns=${vulns_value}" >> $GITHUB_ENV
-
+              echo "HELLO=WORLD" >> "$GITHUB_OUTPUT"
           - name: one-2
             run: |
-                echo ${{ steps.set-vulns-output.outputs.vulns }}
+              echo "${{steps.set-some-stuff.outputs.HELLO}}"
+
+          # - name: Set VULNS output
+          #   id: set-vulns-output
+          #   run: |
+          #       vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
+          #       echo "vulns=${vulns_value}" >> $GITHUB_ENV
+
+          # - name: one-2
+          #   run: |
+          #       echo ${{ steps.set-vulns-output.outputs.vulns }}
 
 
           #install Cosign
@@ -96,12 +105,12 @@ jobs:
     Slack-Notify:
           #runner
           runs-on: ubuntu-latest    
-          needs: scan
+          needs: one
           steps:
               #Slack Notifcaiton
               - name: Print Variable from Job 1
                 run: |
-                    echo "${{ needs.scan.outputs.vulns }}"
+                  echo "${{ needs.one.outputs.HELLO }}"
 
     #           - name: Slack_Summary
     #             id: Slack_Summary
