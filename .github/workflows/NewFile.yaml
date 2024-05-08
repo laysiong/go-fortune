@@ -25,65 +25,71 @@ jobs:
             with:
                 scan-type: 'fs'
                 scan-ref: '.'
-                format: 'json' 
-                output: './trivy-report.json'
+                format: 'sarif' 
+                output: 'trivy-report.sarif'
                 severity: 'HIGH' #CRITICAL
+
+          - name: Upload Trivy scan results to GitHub Security tab
+            uses: github/codeql-action/upload-sarif@v2
+            with:
+                sarif_file: 'trivy-results.sarif'
 
           - name: Set VULNS output
             id: set-vulns-output
             run: |
-                vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
+                # vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
+                vulns_value = true
                 echo "$vulns_value"
                 echo "vulns=${vulns_value}" >> $GITHUB_OUTPUT
 
           #install Cosign
-          - name: Install Cosign
-            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
-            uses: sigstore/cosign-installer@v3.5.0
+          # - name: Install Cosign
+          #   if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
+          #   uses: sigstore/cosign-installer@v3.5.0
             
       
-          - name: Log into registry
-            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
-            uses: docker/login-action@v3
-            with:
-              username: ${{ secrets.dockerhub_username }}
-              password: ${{ secrets.dockerhub_token }}            
+          # - name: Log into registry
+          #   if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
+          #   uses: docker/login-action@v3
+          #   with:
+          #     username: ${{ secrets.dockerhub_username }}
+          #     password: ${{ secrets.dockerhub_token }}            
       
 
-          - name: build and push docker image
-            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
-            id: build-and-push
-            uses: docker/build-push-action@v5
-            with:
-              context: .
-              push : true
-              tags: ${{ github.repository }}:${{github.run_id}}
-              secrets: |
-                GIT_AUTH_TOKEN=${{ secrets.MY_API }}
+          # - name: build and push docker image
+          #   if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
+          #   id: build-and-push
+          #   uses: docker/build-push-action@v5
+          #   with:
+          #     context: .
+          #     push : true
+          #     tags: ${{ github.repository }}:${{github.run_id}}
+          #     secrets: |
+          #       GIT_AUTH_TOKEN=${{ secrets.MY_API }}
 
 
 
           #consign generate-key-pairs
           #consign sign --key cosign.key <acct_name>/myapp:<git-commit>
-          - name: Generate Cosign Key Pairs
-            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
-            id: generate_keys
-            run: |
-              cosign generate-key-pair
+          # - name: Generate Cosign Key Pairs
+          #   if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
+          #   id: generate_keys
+          #   run: |
+          #     cosign generate-key-pair
 
-          - name: Get Docker image digest
-            id: get-digest
-            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
-            run: |
-                DIGEST=$(docker manifest inspect ${{ github.repository }}:${{ github.run_id }} | jq -r '.config.digest')
-                echo "digest=$DIGEST" >>$GITHUB_OUTPUT
+          # - name: Get Docker image digest
+          #   id: get-digest
+          #   if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
+          #   run: |
+          #       DIGEST=$(docker manifest inspect ${{ github.repository }}:${{ github.run_id }} | jq -r '.config.digest')
+          #       echo "digest=$DIGEST" >>$GITHUB_OUTPUT
 
-          - name: Sign Docker Image
-            if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
-            run: |
-                cosign sign --key cosign.key ${{ github.repository }}@${{ steps.get-digest.outputs.digest }}
-            env:
-                COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          # - name: Sign Docker Image
+          #   if: ${{ steps.set-vulns-output.outputs.vulns != 'true' }}
+          #   run: |
+          #       cosign sign --key cosign.key ${{ github.repository }}@${{ steps.get-digest.outputs.digest }}
+          #   env:
+          #       COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
 
 
@@ -129,7 +135,7 @@ jobs:
             with:
                 scan-type: 'convert'
                 vuln-type: ""
-                image-ref: './trivy-report.json'
+                image-ref: './trivy-report.sarif'
                 format: 'table'
                 output: './trivy-report.txt'
 
