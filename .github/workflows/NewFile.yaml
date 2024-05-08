@@ -146,7 +146,7 @@ jobs:
 
     Upload-report:
           #runner
-          needs: fs-scan
+          needs: [Slack-Notify,fs-scan]
           if: ${{ needs.fs-scan.outputs.vulns == 'true' }}
           runs-on: ubuntu-latest    
           steps:
