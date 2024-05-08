@@ -33,9 +33,8 @@ jobs:
           - name: Set VULNS output
             id: set-vulns-output
             run: |
-                vulns_value = true
-                echo "$vulns_value"
-                echo "vulns=${vulns_value}" >> $GITHUB_OUTPUT
+         
+                echo "vulns=true" >> $GITHUB_OUTPUT
 
           #install Cosign
           # - name: Install Cosign
