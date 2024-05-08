@@ -13,7 +13,7 @@ jobs:
         #runner
         runs-on: ubuntu-latest    
         outputs:
-            fs-scan-outcome: ${{ steps.set-variable.outputs.vulns }}
+            fs-scan-outcome: ${{ steps.set-vulns-output.outputs.vulns }}
         if: "!startsWith(github.event.head_commit.message, '#NORUN')"
         #steps in this job
         steps:
