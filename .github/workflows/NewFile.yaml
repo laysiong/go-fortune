@@ -39,21 +39,13 @@ jobs:
                 echo "vulns=${vulns_value}" >> "$GITHUB_OUTPUT"
 
                     #upload report if vulns is found
-          - name: Convert Trivy report to Slack-compatible format
-            uses: aquasecurity/trivy-action@0.12.0
-            with:
-                scan-type: 'convert'
-                vuln-type: ""
-                image-ref: './trivy-report.json'
-                format: 'table'
-                severity: "HIGH,CRITICAL"
-                output: './trivy-report.txt'
+
 
           - name: Upload trivy report as a Github artifact
             uses: actions/upload-artifact@v4
             with:
                 name: trivy-sbom-report
-                path: './trivy-report.txt'
+                path: './trivy-report.json'
 
           # - name: one-2
           #   run: |
@@ -159,7 +151,21 @@ jobs:
           if: ${{ needs.fs-scan.outputs.vulns == 'true' }}
           runs-on: ubuntu-latest    
           steps:
+            
+              - name: Download math result for job 2
+                uses: actions/download-artifact@v4
+                with:
+                 name: trivy-sbom-report
 
+              - name: Convert Trivy report to Slack-compatible format
+                uses: aquasecurity/trivy-action@0.12.0
+                with:
+                scan-type: 'convert'
+                vuln-type: ""
+                image-ref: './trivy-report.json'
+                format: 'table'
+                severity: "HIGH,CRITICAL"
+                output: './trivy-report.txt'
 
               - name: Upload Trivy report to Slack
                 uses: MeilCli/slack-upload-file@v4
