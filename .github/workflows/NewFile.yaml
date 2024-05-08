@@ -13,8 +13,8 @@ jobs:
         #runner
         runs-on: ubuntu-latest    
         outputs:
-          #vulns: ${{ steps.set-vulns-output.outputs.vulns }}
-          HELLO: "${{ steps.set-some-stuff.outputs.HELLO }}"
+          vulns: ${{ steps.set-vulns-output.outputs.vulns }}
+          #HELLO: "${{ steps.set-some-stuff.outputs.HELLO }}"
 
         if: "!startsWith(github.event.head_commit.message, '#NORUN')"
         #steps in this job
@@ -33,23 +33,23 @@ jobs:
                 output: './trivy-report.json'
                 severity: 'HIGH' #CRITICAL
 
-          - name: one-1
-            id: set-some-stuff
-            run: |
-              echo "HELLO=WORLD" >> "$GITHUB_OUTPUT"
-          - name: one-2
-            run: |
-              echo "${{steps.set-some-stuff.outputs.HELLO}}"
-
-          # - name: Set VULNS output
-          #   id: set-vulns-output
+          # - name: one-1
+          #   id: set-some-stuff
           #   run: |
-          #       vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
-          #       echo "vulns=${vulns_value}" >> $GITHUB_ENV
-
+          #     echo "HELLO=WORLD" >> "$GITHUB_OUTPUT"
           # - name: one-2
           #   run: |
-          #       echo ${{ steps.set-vulns-output.outputs.vulns }}
+          #     echo "${{steps.set-some-stuff.outputs.HELLO}}"
+
+          - name: Set VULNS output
+            id: set-vulns-output
+            run: |
+                vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
+                echo "vulns=${vulns_value}" >> "$GITHUB_OUTPUT"
+
+          - name: one-2
+            run: |
+                echo ${{ steps.set-vulns-output.outputs.vulns }}
 
 
           #install Cosign
@@ -110,40 +110,40 @@ jobs:
               #Slack Notifcaiton
               - name: Print Variable from Job 1
                 run: |
-                  echo "${{ needs.one.outputs.HELLO }}"
+                  echo "${{ needs.one.outputs.vulns }}"
 
-    #           - name: Slack_Summary
-    #             id: Slack_Summary
-    #             run: |
-    #               if [[ "${{ needs.fs-scan.outputs.vulns }}" == 'true' ]]; then
-    #                   slack_color="danger"    
-    #                   slack_message="Failed trivy scan, see uploaded report"
-    #                   slack_title="Scan failed - Toh Lay Siong"
+              - name: Slack_Summary
+                id: Slack_Summary
+                run: |
+                  if [[ "${{ needs.one.outputs.vulns }}" == 'true' ]]; then
+                      slack_color="danger"    
+                      slack_message="Failed trivy scan, see uploaded report"
+                      slack_title="Scan failed - Toh Lay Siong"
 
-    #                 else
-    #                   slack_color="good"
-    #                   slack_message="* Name:* Toh Lay Siong
-    #               * Metriculation:* A0291916W
-    #               * Email:* E1336249@u.nus.edu
-    #               * Git:* ${{ github.server_url }}/${{ github.repository }}
-    #               * Image:* <https://hub.docker.com/repository/docker/${{ github.repository }}>"
-    #                 slack_title="Image build and signed"
+                    else
+                      slack_color="good"
+                      slack_message="* Name:* Toh Lay Siong
+                  * Metriculation:* A0291916W
+                  * Email:* E1336249@u.nus.edu
+                  * Git:* ${{ github.server_url }}/${{ github.repository }}
+                  * Image:* <https://hub.docker.com/repository/docker/${{ github.repository }}>"
+                    slack_title="Image build and signed"
 
-    #                 fi
+                    fi
 
-    #                 echo "slack-color=$slack_color" >> $GITHUB_OUTPUT
-    #                 echo 'slack-message<<EOF' >> $GITHUB_OUTPUT
-    #                 echo "$slack_message" >> $GITHUB_OUTPUT
-    #                 echo 'EOF' >> $GITHUB_OUTPUT
-    #                 echo "slack-title=$slack_title" >> $GITHUB_OUTPUT
+                    echo "slack-color=$slack_color" >> $GITHUB_OUTPUT
+                    echo 'slack-message<<EOF' >> $GITHUB_OUTPUT
+                    echo "$slack_message" >> $GITHUB_OUTPUT
+                    echo 'EOF' >> $GITHUB_OUTPUT
+                    echo "slack-title=$slack_title" >> $GITHUB_OUTPUT
 
-    #           - name: Slack Notification
-    #             uses: rtCamp/action-slack-notify@v2
-    #             env:
-    #                 SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
-    #                 SLACK_COLOR: ${{ steps.Slack_Summary.outputs.slack-color }}
-    #                 SLACK_MESSAGE: ${{ steps.Slack_Summary.outputs.slack-message }}
-    #                 SLACK_TITLE:  ${{ steps.Slack_Summary.outputs.slack-title }}
+              - name: Slack Notification
+                uses: rtCamp/action-slack-notify@v2
+                env:
+                    SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
+                    SLACK_COLOR: ${{ steps.Slack_Summary.outputs.slack-color }}
+                    SLACK_MESSAGE: ${{ steps.Slack_Summary.outputs.slack-message }}
+                    SLACK_TITLE:  ${{ steps.Slack_Summary.outputs.slack-title }}
 
     # Upload-report:
     #       #runner
