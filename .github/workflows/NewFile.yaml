@@ -30,7 +30,7 @@ jobs:
                 severity: 'HIGH' #CRITICAL
 
           - name: Upload Trivy scan results to GitHub Security tab
-            uses: github/codeql-action/upload-sarif@v2
+            uses: github/codeql-action/upload-sarif@v3
             with:
                 sarif_file: 'trivy-results.sarif'
 
@@ -135,16 +135,16 @@ jobs:
             with:
                 scan-type: 'convert'
                 vuln-type: ""
-                image-ref: './trivy-report.sarif'
+                image-ref: 'trivy-report.sarif'
                 format: 'table'
-                output: './trivy-report.txt'
+                output: 'trivy-report.txt'
 
           - name: Upload trivy report as a Github artifact
             if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
             uses: actions/upload-artifact@v4
             with:
               name: trivy-sbom-report
-              path: './trivy-report.txt'
+              path: 'trivy-report.txt'
 
           - name: Upload Trivy report to Slack
             if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
@@ -152,7 +152,7 @@ jobs:
             with:
                 slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
                 channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
-                file_path: './trivy-report.txt'
+                file_path: 'trivy-report.txt'
                 initial_comment: 'Scan report by Toh Lay Siong'
 
 
