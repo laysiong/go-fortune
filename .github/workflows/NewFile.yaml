@@ -94,6 +94,10 @@ jobs:
           runs-on: ubuntu-latest    
           steps:
           #Slack Notifcaiton
+          - name: Print Variable from Job 1
+            run: |
+                echo "${{  needs.fs-scan.outputs.fs-scan-outcome  }}"
+
           - name: Slack_Summary
             id: Slack_Summary
             run: |
