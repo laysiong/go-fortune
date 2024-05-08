@@ -1,6 +1,6 @@
 name: Build and Push
 
-
+#CRITICAL
 #trigger
 on:
    push:
@@ -106,10 +106,6 @@ jobs:
               bulid-and-push
           steps:
               #Slack Notifcaiton
-              - name: Print Variable from Job 1
-                run: |
-                  echo "${{ needs.fs-scan.outputs.vulns }}"
-
               - name: Slack_Summary
                 id: Slack_Summary
                 run: |
@@ -144,10 +140,6 @@ jobs:
           if: ${{ needs.fs-scan.outputs.vulns == 'true' }}
           steps:
               #Slack Notifcaiton
-              - name: Print Variable from Job 1
-                run: |
-                  echo "${{ needs.fs-scan.outputs.vulns }}"
-
               - name: Slack_Summary
                 id: Slack_Summary
                 run: |
