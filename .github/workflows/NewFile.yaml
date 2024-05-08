@@ -33,7 +33,6 @@ jobs:
           - name: Set VULNS output
             id: set-vulns-output
             run: |
-                # vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
                 vulns_value = true
                 echo "$vulns_value"
                 echo "vulns=${vulns_value}" >> $GITHUB_OUTPUT
