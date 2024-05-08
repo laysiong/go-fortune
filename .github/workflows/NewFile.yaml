@@ -13,7 +13,7 @@ jobs:
         #runner
         runs-on: ubuntu-latest    
         outputs:
-            fs-scan-outcome: ${{ steps.set-vulns-output.outputs.vulns }}
+          fs-scan-outcome: ${{ steps.set-vulns-output.outputs.vulns }}
         if: "!startsWith(github.event.head_commit.message, '#NORUN')"
         #steps in this job
         steps:
@@ -93,43 +93,43 @@ jobs:
           needs: fs-scan
           runs-on: ubuntu-latest    
           steps:
-          #Slack Notifcaiton
-          - name: Print Variable from Job 1
-            run: |
-                echo "${{  needs.fs-scan.outputs.fs-scan-outcome  }}"
+              #Slack Notifcaiton
+              - name: Print Variable from Job 1
+                run: |
+                    echo "${{ needs.fs-scan.outputs.fs-scan-outcome }}"
 
-          - name: Slack_Summary
-            id: Slack_Summary
-            run: |
-              if [[ "${{ needs.fs-scan.outputs.fs-scan-outcome }}" == 'true' ]]; then
-                  slack_color="danger"    
-                  slack_message="Failed trivy scan, see uploaded report"
-                  slack_title="Scan failed - Toh Lay Siong"
+              - name: Slack_Summary
+                id: Slack_Summary
+                run: |
+                  if [[ "${{ needs.fs-scan.outputs.fs-scan-outcome }}" == 'true' ]]; then
+                      slack_color="danger"    
+                      slack_message="Failed trivy scan, see uploaded report"
+                      slack_title="Scan failed - Toh Lay Siong"
 
-                else
-                  slack_color="good"
-                  slack_message="* Name:* Toh Lay Siong
-              * Metriculation:* A0291916W
-              * Email:* E1336249@u.nus.edu
-              * Git:* ${{ github.server_url }}/${{ github.repository }}
-              * Image:* <https://hub.docker.com/repository/docker/${{ github.repository }}>"
-                slack_title="Image build and signed"
+                    else
+                      slack_color="good"
+                      slack_message="* Name:* Toh Lay Siong
+                  * Metriculation:* A0291916W
+                  * Email:* E1336249@u.nus.edu
+                  * Git:* ${{ github.server_url }}/${{ github.repository }}
+                  * Image:* <https://hub.docker.com/repository/docker/${{ github.repository }}>"
+                    slack_title="Image build and signed"
 
-                fi
+                    fi
 
-                echo "slack-color=$slack_color" >> $GITHUB_OUTPUT
-                echo 'slack-message<<EOF' >> $GITHUB_OUTPUT
-                echo "$slack_message" >> $GITHUB_OUTPUT
-                echo 'EOF' >> $GITHUB_OUTPUT
-                echo "slack-title=$slack_title" >> $GITHUB_OUTPUT
+                    echo "slack-color=$slack_color" >> $GITHUB_OUTPUT
+                    echo 'slack-message<<EOF' >> $GITHUB_OUTPUT
+                    echo "$slack_message" >> $GITHUB_OUTPUT
+                    echo 'EOF' >> $GITHUB_OUTPUT
+                    echo "slack-title=$slack_title" >> $GITHUB_OUTPUT
 
-          - name: Slack Notification
-            uses: rtCamp/action-slack-notify@v2
-            env:
-                SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
-                SLACK_COLOR: ${{ steps.Slack_Summary.outputs.slack-color }}
-                SLACK_MESSAGE: ${{ steps.Slack_Summary.outputs.slack-message }}
-                SLACK_TITLE:  ${{ steps.Slack_Summary.outputs.slack-title }}
+              - name: Slack Notification
+                uses: rtCamp/action-slack-notify@v2
+                env:
+                    SLACK_WEBHOOK: ${{ secrets.P_SLACK_API }}
+                    SLACK_COLOR: ${{ steps.Slack_Summary.outputs.slack-color }}
+                    SLACK_MESSAGE: ${{ steps.Slack_Summary.outputs.slack-message }}
+                    SLACK_TITLE:  ${{ steps.Slack_Summary.outputs.slack-title }}
 
     Upload-report:
           #runner
@@ -137,30 +137,30 @@ jobs:
           if: ${{ needs.fs-scan.outputs.fs-scan-outcome == 'true' }}
           runs-on: ubuntu-latest    
           steps:
-          #upload report if vulns is found
-          - name: Convert Trivy report to Slack-compatible format
-            uses: aquasecurity/trivy-action@0.12.0
-            with:
-                scan-type: 'convert'
-                vuln-type: ""
-                image-ref: './trivy-report.json'
-                format: 'table'
-                severity: "HIGH,CRITICAL"
-                output: './trivy-report.txt'
+              #upload report if vulns is found
+              - name: Convert Trivy report to Slack-compatible format
+                uses: aquasecurity/trivy-action@0.12.0
+                with:
+                    scan-type: 'convert'
+                    vuln-type: ""
+                    image-ref: './trivy-report.json'
+                    format: 'table'
+                    severity: "HIGH,CRITICAL"
+                    output: './trivy-report.txt'
 
-          - name: Upload trivy report as a Github artifact
-            uses: actions/upload-artifact@v4
-            with:
-              name: trivy-sbom-report
-              path: './trivy-report.txt'
+              - name: Upload trivy report as a Github artifact
+                uses: actions/upload-artifact@v4
+                with:
+                  name: trivy-sbom-report
+                  path: './trivy-report.txt'
 
-          - name: Upload Trivy report to Slack
-            uses: MeilCli/slack-upload-file@v4
-            with:
-                slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
-                channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
-                file_path: './trivy-report.txt'
-                initial_comment: 'Scan report by Toh Lay Siong'
+              - name: Upload Trivy report to Slack
+                uses: MeilCli/slack-upload-file@v4
+                with:
+                    slack_token: ${{secrets.P_SLACK_BOT_TOKEN}}
+                    channel_id: ${{secrets.P_SLACK_CHANNEL_ID}}
+                    file_path: './trivy-report.txt'
+                    initial_comment: 'Scan report by Toh Lay Siong'
 
 
 
