@@ -21,7 +21,6 @@ jobs:
           - name: checkout source code
             uses: actions/checkout@v4
 
-
           #Trivy fs -s file(.)
           - name: Run Trivy vulnerability scanner in fs mode
             uses: aquasecurity/trivy-action@master
@@ -56,6 +55,8 @@ jobs:
           if: ${{ needs.fs-scan.outputs.vulns != 'true' }}
           runs-on: ubuntu-latest    
           steps:
+              - name: checkout source code
+                uses: actions/checkout@v4
 
               #install Cosign
               - name: Install Cosign
