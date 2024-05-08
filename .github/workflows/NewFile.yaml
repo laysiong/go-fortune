@@ -33,8 +33,8 @@ jobs:
           - name: Set VULNS output
             id: set-vulns-output
             run: |
-         
-                echo "vulns=true" >> $GITHUB_OUTPUT
+                vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
+                echo "vulns=${vulns_value}" >> $GITHUB_OUTPUT
 
           #install Cosign
           # - name: Install Cosign
@@ -131,7 +131,7 @@ jobs:
                 vuln-type: ""
                 image-ref: './trivy-report.json'
                 format: 'table'
-                severity: ""
+                severity: "HIGH, CRITICAL"
                 output: './trivy-report.txt'
 
           - name: Upload trivy report as a Github artifact
