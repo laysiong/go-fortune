@@ -131,7 +131,7 @@ jobs:
                 vuln-type: ""
                 image-ref: './trivy-report.json'
                 format: 'table'
-                severity: "HIGH, CRITICAL"
+                severity: "HIGH,CRITICAL"
                 output: './trivy-report.txt'
 
           - name: Upload trivy report as a Github artifact
