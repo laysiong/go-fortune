@@ -102,7 +102,7 @@ jobs:
     Slack-Notify:
           #runner
           runs-on: ubuntu-latest    
-          needs: [fs-scan,bulid-and-push]
+          needs: [bulid-and-push]
           if: ${{ always() }}
           steps:
               #Slack Notifcaiton
@@ -146,7 +146,7 @@ jobs:
 
     Upload-report:
           #runner
-          needs: [Slack-Notify,fs-scan]
+          needs: [fs-scan,Slack-Notify]
           if: ${{ needs.fs-scan.outputs.vulns == 'true' }}
           runs-on: ubuntu-latest    
           steps:
