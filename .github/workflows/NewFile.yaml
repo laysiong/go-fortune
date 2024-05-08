@@ -122,18 +122,15 @@ jobs:
                 SLACK_TITLE:  ${{ steps.Slack_Summary.outputs.slack-title }}
 
 
-                #   scan-type: 'convert'
-                # vuln-type: ""
-                # image-ref: './trivy-report.json'
-                # format: 'table'
-                # output: './trivy-report.txt'
           #upload report if vulns is found
           - name: Convert Trivy report to Slack-compatible format
             if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
-            #uses: aquasecurity/trivy-action@0.12.0
-            run: |
-               jq -r '.[].Vulnerabilities | map(select(.Severity == "HIGH" or .Severity == "CRITICAL")) | length' < ./trivy-report.json > ./filtered-trivy-report.json
-               trivy convert --format table --input ./filtered-trivy-report.json --output ./trivy-report.txt
+            uses: aquasecurity/trivy-action@0.12.0
+            with:
+                scan-type: 'convert'
+                image-ref: './trivy-report.json'
+                format: 'table'
+                output: './trivy-report.txt'
 
           - name: Upload trivy report as a Github artifact
             if: ${{ steps.set-vulns-output.outputs.vulns == 'true' }}
