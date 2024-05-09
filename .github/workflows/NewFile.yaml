@@ -29,7 +29,7 @@ jobs:
                 scan-ref: '.'
                 format: 'json' 
                 output: './trivy-report.json'
-                severity: 'CRITICAL' #CRITICAL
+                severity: 'HIGH' #CRITICAL
 
           - name: Set VULNS output
             id: set-vulns-output
