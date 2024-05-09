@@ -1,6 +1,6 @@
 name: Build and Push
 
-#BackToMySlack
+#Release v1.0
 #trigger
 on:
    push:
