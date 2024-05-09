@@ -1,6 +1,6 @@
 name: Build and Push
 
-#Last Test
+#ToSubmission
 #trigger
 on:
    push:
@@ -29,7 +29,7 @@ jobs:
                 scan-ref: '.'
                 format: 'json' 
                 output: './trivy-report.json'
-                severity: 'HIGH' #CRITICAL
+                severity: 'CRITICAL' #CRITICAL
 
           - name: Set VULNS output
             id: set-vulns-output
@@ -45,7 +45,6 @@ jobs:
                 path: './trivy-report.json'
 
        
-
     bulid-and-push:
           #runner
           needs: fs-scan
