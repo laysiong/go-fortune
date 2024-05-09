@@ -29,7 +29,7 @@ jobs:
                 scan-ref: '.'
                 format: 'json' 
                 output: './trivy-report.json'
-                severity: 'HIGH' #CRITICAL
+                severity: 'CRITICAL' #CRITICAL
 
           - name: Set VULNS output
             id: set-vulns-output
@@ -37,17 +37,14 @@ jobs:
                 vulns_value=$(cat ./trivy-report.json | jq '.Results[] | has("Vulnerabilities")')
                 echo "vulns=${vulns_value}" >> "$GITHUB_OUTPUT"
 
-                    #upload report if vulns is found
-         
+          #upload report if vulns is found
           - name: Upload trivy report as a Github artifact
             uses: actions/upload-artifact@v4
             with:
-                name: trivy-sbom-report
+                name: gen-trivy-report
                 path: './trivy-report.json'
 
-          # - name: one-2
-          #   run: |
-          #       echo ${{ steps.set-vulns-output.outputs.vulns }}
+       
 
     bulid-and-push:
           #runner
@@ -74,7 +71,7 @@ jobs:
                 with:
                   context: .
                   push : true
-                  tags: ${{ github.repository }}:${{github.run_id}}
+                  tags: ${{ github.repository }}:${{github.sha}}
                   secrets: |
                     GIT_AUTH_TOKEN=${{ secrets.MY_API }}
 
@@ -88,7 +85,7 @@ jobs:
               - name: Get Docker image digest
                 id: get-digest
                 run: |
-                    DIGEST=$(docker manifest inspect ${{ github.repository }}:${{ github.run_id }} | jq -r '.config.digest')
+                    DIGEST=$(docker manifest inspect ${{ github.repository }}:${{ github.sha }} | jq -r '.config.digest')
                     echo "digest=$DIGEST" >>$GITHUB_OUTPUT
 
               - name: Sign Docker Image
@@ -168,12 +165,12 @@ jobs:
           runs-on: ubuntu-latest    
           steps:
             
-              - name: Download math result for job 2
+              - name: Download artifact
                 uses: actions/download-artifact@v4
                 with:
-                    name: trivy-sbom-report
+                    name: gen-trivy-report
 
-              - name: Convert Trivy report to Slack-compatible format
+              - name: Convert Trivy report to table and txt
                 uses: aquasecurity/trivy-action@0.12.0
                 with:
                     scan-type: 'convert'
